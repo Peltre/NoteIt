@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build ready generated folders
+dist/
+out/
+
+# npm's error logging
+npm-debug.log*
+
+# trash system files
+.DS_Store
+Thumbs.db
+
+# private data
+.env

@@ -1,0 +1,24 @@
+{
+  "name": "noteit",
+  "version": "1.0.0",
+  "description": "Desktop interface app that lets you add sticky notes to any part of your screen, with a little zoom like interface that can be summoned by a key combo",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Peltre/NoteIt.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Peltre/NoteIt/issues"
+  },
+  "homepage": "https://github.com/Peltre/NoteIt#readme",
+  "devDependencies": {
+    "electron": "^44.4.5"
+  }
+}
