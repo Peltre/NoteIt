@@ -7,5 +7,9 @@ contextBridge.exposeInMainWorld('api', {
     onAddNote: (callback) => ipcRenderer.on('notes:add', callback),
     onToggleNotes: (callback) => ipcRenderer.on('notes:toggle', callback),
     saveNotes: (notes) => ipcRenderer.send('notes:save', notes),
-    loadNotes: () => ipcRenderer.invoke('notes:load')
+    loadNotes: () => ipcRenderer.invoke('notes:load'),
+    moveCanvas: (dx, dy) => ipcRenderer.send('canvas:move', { dx, dy }),
+    resizeCanvas: (dx, dy) => ipcRenderer.send('canvas:resize', { dx, dy }),
+    saveCanvas: () => ipcRenderer.send('canvas:save'),
+    fitCanvas: () => ipcRenderer.send('canvas:fit')
 })

@@ -21,6 +21,16 @@ const addNoteBtn = document.getElementById('addNote')
 let noteCount = 0
 let dragging = false
 
+// Make bounds so post-its cant escape the canvas
+function clampToCanvas(element) {
+    const maxLeft = Math.max(0, canvas.clientWidth - element.offsetWidth)
+    const maxTop = Math.max(0, canvas.clientHeight - element.offsetHeight)
+    const left = parseInt(element.style.left) || 0
+    const top = parseInt(element.style.top) || 0
+    element.style.left = Math.min(Math.max(0, left), maxLeft) + 'px'
+    element.style.top = Math.min(Math.max(0, top), maxTop) + 'px'
+}
+
 // Ability to drag post it notes and place them in any part of the screen
 function makeDraggable(element, handle, onDrop) {
     let offsetX = 0
@@ -44,6 +54,7 @@ function makeDraggable(element, handle, onDrop) {
         if (!dragging) return
         element.style.left = (event.clientX - offsetX) + 'px'
         element.style.top = (event.clientY - offsetY) + 'px'
+        clampToCanvas(element)
     })
 
     // stop dragging state
@@ -90,6 +101,7 @@ function createNote(x, y, text = '') {
 
     makeDraggable(note, note.querySelector('.noteHeader'), saveNotes)
     canvas.appendChild(note)
+    clampToCanvas(note)
     textarea.focus()
 }
 
@@ -129,3 +141,51 @@ async function loadNotes() {
 }
 
 loadNotes()
+
+const editCanvasBtn = document.getElementById('editCanvas')
+editCanvasBtn.addEventListener('click', () => {
+    canvas.classList.toggle('editing')
+})
+
+function makeWindowHandle(handle, onDrag) {
+    let lastX = 0
+    let lastY = 0
+
+    handle.addEventListener('pointerdown', (event) => {
+        lastX = event.screenX
+        lastY = event.screenY
+        dragging = true
+        handle.setPointerCapture(event.pointerId)
+    })
+
+    handle.addEventListener('pointermove', (event) => {
+        if (!dragging) return
+        const dx = event.screenX - lastX
+        const dy = event.screenY - lastY
+        lastX = event.screenX
+        lastY = event.screenY
+        onDrag(dx, dy)
+    })
+
+    handle.addEventListener('pointerup', () => {
+        dragging = false
+        window.api.saveCanvas()
+    })
+}
+
+makeWindowHandle(document.getElementById('moveHandle'), (dx, dy) => {
+    window.api.moveCanvas(dx, dy)
+})
+
+makeWindowHandle(document.getElementById('resizeHandle'), (dx, dy) => {
+    window.api.resizeCanvas(dx, dy)
+})
+
+window.addEventListener('resize', () => {
+    canvas.querySelectorAll('.note').forEach(clampToCanvas)
+    saveNotes()
+})
+
+document.getElementById('fitHandle').addEventListener('click', () => {
+    window.api.fitCanvas()
+})
