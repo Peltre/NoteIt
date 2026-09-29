@@ -52,6 +52,7 @@ function makeDraggable(element, handle) {
     })
 }
 
+// Function to create a note
 function createNote(x, y) {
     const note = document.createElement('div')
     note.className = 'note interactive'
@@ -74,12 +75,27 @@ function createNote(x, y) {
     note.querySelector('textarea').focus()
 }
 
-// Connect button with addNote func
-addNoteBtn.addEventListener('click', () => {
+// New segmented function for adding notes (will be used for shortcuts)
+function addNote() {
     noteCount++
     createNote(120 + noteCount * 30, 120 + noteCount * 30)
-})
+}
+
+// Listener for the "+" sign in the master bar
+addNoteBtn.addEventListener('click', addNote)
 
 // Make masterBar draggable as well
 const masterBar = document.querySelector('.masterBar')
 makeDraggable(masterBar, masterBar)
+
+// Visibility toggle logic
+const toggleNotesBtn = document.getElementById('toggleNotes')
+let notesVisible = true
+
+function toggleNotes() {
+    notesVisible = !notesVisible
+    canvas.classList.toggle('notesHidden', !notesVisible)
+    toggleNotesBtn.textContent = notesVisible ? '👁' : '-'
+}
+
+toggleNotesBtn.addEventListener('click', toggleNotes)

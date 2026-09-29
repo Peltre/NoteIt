@@ -57,6 +57,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: opacity 0.2s, transform 0.2s;
 }
 
 .noteHeader {
@@ -100,5 +101,13 @@ button:hover {
 .masterBar:active {
     cursor: grabbing;
 }
+
+.notesHidden .note {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+}
+
+
 
 
