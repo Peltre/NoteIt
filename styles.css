@@ -18,7 +18,7 @@ html, body {
     position: absolute;
     top: 16px;
     left: 50%;
-    transform: translateY(-50%); /* Center horizontally */
+    transform: translateX(-50%); /* Center horizontally */
     display: flex;
     gap: 4px;
     padding: 4px 8px;
@@ -36,7 +36,7 @@ button {
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
-    transition: background 0. 15;
+    transition: background 0.15s;
 }
 
 button:hover {
