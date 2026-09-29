@@ -99,3 +99,7 @@ function toggleNotes() {
 }
 
 toggleNotesBtn.addEventListener('click', toggleNotes)
+
+// global shortcut activation
+window.api.onAddNote(addNote)
+window.api.onToggleNotes(toggleNotes)

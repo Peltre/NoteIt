@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, ipcMain } = require('electron')
+const { app, BrowserWindow, screen, ipcMain, globalShortcut } = require('electron')
 const path = require('path')
 
 function createCanvas() {
@@ -32,7 +32,18 @@ function createCanvas() {
     ipcMain.on('mouse:breach', () => {
         canvas.setIgnoreMouseEvents(true, { forward: true })
     })
+
+    // Shortcut to create a new note
+    globalShortcut.register('CommandOrControl+Shift+C', () => {
+        canvas.webContents.send('notes:add')
+    })
+
+    // Shortcut to toggle note visibiliy
+    globalShortcut.register('CommandOrControl+Shift+H', () => {
+        canvas.webContents.send('notes:toggle')
+    })
 }
 
 app.whenReady().then(createCanvas)
+app.on('will-quit', () => globalShortcut.unregisterAll())
 app.on('window-all-closed', () => app.quit())
