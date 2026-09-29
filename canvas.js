@@ -2,6 +2,8 @@
 let captured = false
 
 document.addEventListener('mousemove', (event) => {
+    if (dragging) return // Handle mouse pointer escaping while dragging
+
     const hoverInteractive = event.target.closest('.interactive') !== null
 
     if (hoverInteractive && !captured) {
@@ -17,6 +19,38 @@ document.addEventListener('mousemove', (event) => {
 const canvas = document.getElementById('canvas')
 const addNoteBtn = document.getElementById('addNote')
 let noteCount = 0
+let dragging = false
+
+// Ability to drag post it notes and place them in any part of the screen
+function makeDraggable(element, handle) {
+    let offsetX = 0
+    let offsetY = 0
+
+    // Select note to drag it around
+    handle.addEventListener('pointerdown', (event) => {
+        if (event.target.closest('button')) return // buttons are not draggable
+
+        const rect = element.getBoundingClientRect()
+        offsetX = event.clientX - rect.left
+        offsetY = event.clientY - rect.top
+
+        dragging = true
+        element.style.transform = 'none'
+        handle.setPointerCapture(event.pointerId)
+    })
+
+    // Move the note itself
+    handle.addEventListener('pointermove', (event) => {
+        if (!dragging) return
+        element.style.left = (event.clientX - offsetX) + 'px'
+        element.style.top = (event.clientY - offsetY) + 'px'
+    })
+
+    // stop dragging state
+    handle.addEventListener('pointerup', () => {
+        dragging = false
+    })
+}
 
 function createNote(x, y) {
     const note = document.createElement('div')
@@ -35,11 +69,17 @@ function createNote(x, y) {
         note.remove()
     })
 
+    makeDraggable(note, note.querySelector('.noteHeader'))
     canvas.appendChild(note)
     note.querySelector('textarea').focus()
 }
 
+// Connect button with addNote func
 addNoteBtn.addEventListener('click', () => {
     noteCount++
     createNote(120 + noteCount * 30, 120 + noteCount * 30)
 })
+
+// Make masterBar draggable as well
+const masterBar = document.querySelector('.masterBar')
+makeDraggable(masterBar, masterBar)

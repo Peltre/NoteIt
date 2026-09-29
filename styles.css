@@ -91,3 +91,14 @@ button:hover {
     outline: none;
 }
 
+.noteHeader,
+.masterBar {
+    cursor: grab;
+}
+
+.noteHeader:active,
+.masterBar:active {
+    cursor: grabbing;
+}
+
+
