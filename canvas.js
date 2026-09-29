@@ -22,7 +22,7 @@ let noteCount = 0
 let dragging = false
 
 // Ability to drag post it notes and place them in any part of the screen
-function makeDraggable(element, handle) {
+function makeDraggable(element, handle, onDrop) {
     let offsetX = 0
     let offsetY = 0
 
@@ -49,11 +49,22 @@ function makeDraggable(element, handle) {
     // stop dragging state
     handle.addEventListener('pointerup', () => {
         dragging = false
+        if (onDrop) onDrop()
     })
 }
 
+// Save function in localStorage
+function saveNotes() {
+    const notes = [...canvas.querySelectorAll('.note')].map(note => ({
+        x: parseInt(note.style.left),
+        y: parseInt(note.style.top),
+        text: note.querySelector('textarea').value
+    }))
+    window.api.saveNotes(notes)
+}
+
 // Function to create a note
-function createNote(x, y) {
+function createNote(x, y, text = '') {
     const note = document.createElement('div')
     note.className = 'note interactive'
     note.style.left = x + 'px'
@@ -66,13 +77,20 @@ function createNote(x, y) {
         <textarea placeholder="Escribe aquí..."></textarea>
     `
 
+    // load initial text and save whenever the user types
+    const textarea = note.querySelector('textarea')
+    textarea.value = text
+    textarea.addEventListener('input', saveNotes)
+
+    // del note and save
     note.querySelector('.deleteNote').addEventListener('click', () => {
         note.remove()
+        saveNotes()
     })
 
-    makeDraggable(note, note.querySelector('.noteHeader'))
+    makeDraggable(note, note.querySelector('.noteHeader'), saveNotes)
     canvas.appendChild(note)
-    note.querySelector('textarea').focus()
+    textarea.focus()
 }
 
 // New segmented function for adding notes (will be used for shortcuts)
@@ -103,3 +121,11 @@ toggleNotesBtn.addEventListener('click', toggleNotes)
 // global shortcut activation
 window.api.onAddNote(addNote)
 window.api.onToggleNotes(toggleNotes)
+
+// Load on start
+async function loadNotes() {
+    const saved = await window.api.loadNotes()
+    saved.forEach(n => createNote(n.x, n.y, n.text))
+}
+
+loadNotes()
