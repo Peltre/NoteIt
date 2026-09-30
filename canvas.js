@@ -1,25 +1,12 @@
-// Mouse handler function
-let captured = false
-
-document.addEventListener('mousemove', (event) => {
-    if (dragging) return // Handle mouse pointer escaping while dragging
-
-    const hoverInteractive = event.target.closest('.interactive') !== null
-
-    if (hoverInteractive && !captured) {
-        captured = true
-        window.api.captureMouse()
-    } else if (!hoverInteractive && captured) {
-        captured = false
-        window.api.breachMouse()
-    }
-})
+// 1. State & references
 
 // Creating post-it notes
 const canvas = document.getElementById('canvas')
 const addNoteBtn = document.getElementById('addNote')
 let noteCount = 0
 let dragging = false
+
+// 2. Position & drag utilities
 
 // Make bounds so post-its cant escape the canvas
 function clampToCanvas(element) {
@@ -63,6 +50,53 @@ function makeDraggable(element, handle, onDrop) {
         if (onDrop) onDrop()
     })
 }
+
+function makeWindowHandle(handle, onDrag) {
+    let lastX = 0
+    let lastY = 0
+
+    handle.addEventListener('pointerdown', (event) => {
+        lastX = event.screenX
+        lastY = event.screenY
+        dragging = true
+        handle.setPointerCapture(event.pointerId)
+    })
+
+    handle.addEventListener('pointermove', (event) => {
+        if (!dragging) return
+        const dx = event.screenX - lastX
+        const dy = event.screenY - lastY
+        lastX = event.screenX
+        lastY = event.screenY
+        onDrag(dx, dy)
+    })
+
+    handle.addEventListener('pointerup', () => {
+        dragging = false
+        window.api.saveCanvas()
+    })
+}
+
+// 3. Mouse: capture / pass-through
+
+// Mouse handler function
+let captured = false
+
+document.addEventListener('mousemove', (event) => {
+    if (dragging) return // Handle mouse pointer escaping while dragging
+
+    const hoverInteractive = event.target.closest('.interactive') !== null
+
+    if (hoverInteractive && !captured) {
+        captured = true
+        window.api.captureMouse()
+    } else if (!hoverInteractive && captured) {
+        captured = false
+        window.api.breachMouse()
+    }
+})
+
+// 4. Notes: save, create, add, load
 
 // Save function in localStorage
 function saveNotes() {
@@ -111,6 +145,14 @@ function addNote() {
     createNote(120 + noteCount * 30, 120 + noteCount * 30)
 }
 
+// Load on start
+async function loadNotes() {
+    const saved = await window.api.loadNotes()
+    saved.forEach(n => createNote(n.x, n.y, n.text))
+}
+
+// 5. Master bar
+
 // Listener for the "+" sign in the master bar
 addNoteBtn.addEventListener('click', addNote)
 
@@ -130,48 +172,12 @@ function toggleNotes() {
 
 toggleNotesBtn.addEventListener('click', toggleNotes)
 
-// global shortcut activation
-window.api.onAddNote(addNote)
-window.api.onToggleNotes(toggleNotes)
-
-// Load on start
-async function loadNotes() {
-    const saved = await window.api.loadNotes()
-    saved.forEach(n => createNote(n.x, n.y, n.text))
-}
-
-loadNotes()
-
 const editCanvasBtn = document.getElementById('editCanvas')
 editCanvasBtn.addEventListener('click', () => {
     canvas.classList.toggle('editing')
 })
 
-function makeWindowHandle(handle, onDrag) {
-    let lastX = 0
-    let lastY = 0
-
-    handle.addEventListener('pointerdown', (event) => {
-        lastX = event.screenX
-        lastY = event.screenY
-        dragging = true
-        handle.setPointerCapture(event.pointerId)
-    })
-
-    handle.addEventListener('pointermove', (event) => {
-        if (!dragging) return
-        const dx = event.screenX - lastX
-        const dy = event.screenY - lastY
-        lastX = event.screenX
-        lastY = event.screenY
-        onDrag(dx, dy)
-    })
-
-    handle.addEventListener('pointerup', () => {
-        dragging = false
-        window.api.saveCanvas()
-    })
-}
+// 6. Canvas: edit mode (move, resize, fit)
 
 makeWindowHandle(document.getElementById('moveHandle'), (dx, dy) => {
     window.api.moveCanvas(dx, dy)
@@ -181,11 +187,21 @@ makeWindowHandle(document.getElementById('resizeHandle'), (dx, dy) => {
     window.api.resizeCanvas(dx, dy)
 })
 
+document.getElementById('fitHandle').addEventListener('click', () => {
+    window.api.fitCanvas()
+})
+
 window.addEventListener('resize', () => {
     canvas.querySelectorAll('.note').forEach(clampToCanvas)
     saveNotes()
 })
 
-document.getElementById('fitHandle').addEventListener('click', () => {
-    window.api.fitCanvas()
-})
+// 7. Global shortcuts (messages from main)
+
+// global shortcut activation
+window.api.onAddNote(addNote)
+window.api.onToggleNotes(toggleNotes)
+
+// 8. Startup
+
+loadNotes()

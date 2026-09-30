@@ -1,6 +1,10 @@
+// 1. Imports
+
 const { app, BrowserWindow, screen, ipcMain, globalShortcut } = require('electron')
 const path = require('path')
 const fs = require('fs')
+
+// 2. Settings helpers
 
 function loadBounds() {
     const settingsPath = path.join(app.getPath('userData'), 'settings.json')
@@ -11,13 +15,20 @@ function loadBounds() {
     }
 }
 
+// 3. Canvas window
+
 function createCanvas() {
+
+    // 3.1 Paths & initial bounds
+
     // New dynamic way to obtain canvasSize if modified from initial (screen size)
     const bounds = loadBounds() || screen.getPrimaryDisplay().workArea
     const { x, y, width, height } = bounds
     const settingsPath = path.join(app.getPath('userData'), 'settings.json')
 
     const dataPath = path.join(app.getPath('userData'), 'notes.json')
+
+    // 3.2 Window creation
 
     const canvas = new BrowserWindow({
         x, y, width, height,
@@ -40,6 +51,8 @@ function createCanvas() {
         fs.writeFileSync(settingsPath, JSON.stringify({ bounds: canvas.getBounds() }, null, 2))
     }
 
+    // 3.3 IPC: mouse capture / pass-through
+
     // On start, mouse breaches canvas
     canvas.setIgnoreMouseEvents(true, { forward: true })
 
@@ -51,15 +64,21 @@ function createCanvas() {
         canvas.setIgnoreMouseEvents(true, { forward: true })
     })
 
+    // 3.4 IPC: notes persistence
+
     ipcMain.on('notes:save', (event, notes) => {
         fs.writeFileSync(dataPath, JSON.stringify(notes, null, 2))
     })
 
-    ipcMain.on('canvas:fit', () => {
-        const display = screen.getDisplayMatching(canvas.getBounds())
-        canvas.setBounds(display.workArea)
-        saveBounds()
+    ipcMain.handle('notes:load', () => {
+        try {
+            return JSON.parse(fs.readFileSync(dataPath, 'utf-8'))
+        } catch {
+            return [] // <- empty on the first execution
+        }
     })
+
+    // 3.5 IPC: canvas move / resize / fit / save
 
     ipcMain.on('canvas:move', (event, { dx, dy }) => {
         const [x, y] = canvas.getPosition()
@@ -71,17 +90,17 @@ function createCanvas() {
         canvas.setSize(Math.round(Math.max(300, w + dx)), Math.round(Math.max(200, h + dy)))
     }) 
 
+    ipcMain.on('canvas:fit', () => {
+        const display = screen.getDisplayMatching(canvas.getBounds())
+        canvas.setBounds(display.workArea)
+        saveBounds()
+    })
+
     ipcMain.on('canvas:save', () => {
         saveBounds()
     })
 
-    ipcMain.handle('notes:load', () => {
-        try {
-            return JSON.parse(fs.readFileSync(dataPath, 'utf-8'))
-        } catch {
-            return [] // <- empty on the first execution
-        }
-    })
+    // 3.6 Global shortcuts
 
     // Shortcut to create a new note
     globalShortcut.register('CommandOrControl+Shift+C', () => {
@@ -93,6 +112,8 @@ function createCanvas() {
         canvas.webContents.send('notes:toggle')
     })
 }
+
+// 4. App lifecycle
 
 app.whenReady().then(createCanvas)
 app.on('will-quit', () => globalShortcut.unregisterAll())
