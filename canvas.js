@@ -27,7 +27,8 @@ function makeDraggable(element, handle, onDrop) {
 
     // Select note to drag it around
     handle.addEventListener('pointerdown', (event) => {
-        if (event.target.closest('button')) return // buttons are not draggable
+        if (event.target.closest('button, input')) return // buttons & inputs are not draggable
+
 
         const rect = element.getBoundingClientRect()
         offsetX = event.clientX - rect.left
@@ -106,7 +107,8 @@ function saveNotes() {
         x: parseInt(note.style.left),
         y: parseInt(note.style.top),
         text: note.querySelector('textarea').value,
-        color: note.dataset.color
+        color: note.dataset.color,
+        title: note.querySelector('.noteTitle').value
     }))
     window.api.saveNotes(notes)
 }
@@ -118,7 +120,7 @@ function setNoteColor(note, color) {
 }
 
 // Function to create a note
-function createNote({ x, y, text = '', color = NOTE_COLORS[0] }) {
+function createNote({ x, y, text = '', color = NOTE_COLORS[0], title = '' }) {
     const note = document.createElement('div')
     note.className = 'note interactive'
     note.style.left = x + 'px'
@@ -127,6 +129,7 @@ function createNote({ x, y, text = '', color = NOTE_COLORS[0] }) {
 
     note.innerHTML = `
         <div class="noteHeader">
+            <input class="noteTitle" placeholder="Título" spellcheck=false>
             <button class="colorNote" title="Cambiar color">●</button>
             <button class="deleteNote" title="Eliminar">✕</button>
         </div>
@@ -139,6 +142,11 @@ function createNote({ x, y, text = '', color = NOTE_COLORS[0] }) {
         setNoteColor(note, NOTE_COLORS[next])
         saveNotes()
     })
+
+    // load initial title and save whenever the user types
+    const titleInput = note.querySelector('.noteTitle')
+    titleInput.value = title
+    titleInput.addEventListener('input', saveNotes)
 
     // load initial text and save whenever the user types
     const textarea = note.querySelector('textarea')
