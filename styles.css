@@ -186,6 +186,20 @@ button:hover {
     background: rgba(0, 0, 0, 0.12);
 }
 
+.noteGrip {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.3);
+    cursor: nwse-resize;
+    user-select: none;
+}
+
 
 
 /* 5. Shared: drag cursors */

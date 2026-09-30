@@ -54,6 +54,35 @@ function makeDraggable(element, handle, onDrop) {
     })
 }
 
+// Function to resize postits from its bottom-right grip
+function makeResizable(element, grip, onDone) {
+    let startX = 0, startY = 0, startW = 0, startH = 0
+
+    grip.addEventListener('pointerdown', (event) => {
+        startX = event.clientX
+        startY = event.clientY
+        startW = element.offsetWidth
+        startH = element.offsetHeight
+        dragging = true
+        grip.setPointerCapture(event.pointerId)
+    })
+
+    grip.addEventListener('pointermove', (event) => {
+        if (!dragging) return
+        const maxW = canvas.clientWidth - parseInt(element.style.left)
+        const maxH = canvas.clientHeight -parseInt(element.style.top)
+        const w = startW + (event.clientX - startX)
+        const h = startH + (event.clientY - startY)
+        element.style.width = Math.min(Math.max(140, w), maxW) + 'px'
+        element.style.height = Math.min(Math.max(100, h), maxH) + 'px'
+    })
+
+    grip.addEventListener('pointerup', () => {
+        dragging = false
+        if (onDone) onDone()
+    })
+}
+
 function makeWindowHandle(handle, onDrag) {
     let lastX = 0
     let lastY = 0
@@ -108,7 +137,9 @@ function saveNotes() {
         y: parseInt(note.style.top),
         text: note.querySelector('textarea').value,
         color: note.dataset.color,
-        title: note.querySelector('.noteTitle').value
+        title: note.querySelector('.noteTitle').value,
+        width: note.offsetWidth,
+        height: note.offsetHeight
     }))
     window.api.saveNotes(notes)
 }
@@ -120,11 +151,13 @@ function setNoteColor(note, color) {
 }
 
 // Function to create a note
-function createNote({ x, y, text = '', color = NOTE_COLORS[0], title = '' }) {
+function createNote({ x, y, text = '', color = NOTE_COLORS[0], title = '', width = 220, height = 200 }) {
     const note = document.createElement('div')
     note.className = 'note interactive'
     note.style.left = x + 'px'
     note.style.top = y + 'px'
+    note.style.width = width + 'px'
+    note.style.height = height + 'px'
     setNoteColor(note, color)
 
     note.innerHTML = `
@@ -134,6 +167,7 @@ function createNote({ x, y, text = '', color = NOTE_COLORS[0], title = '' }) {
             <button class="deleteNote" title="Eliminar">✕</button>
         </div>
         <textarea placeholder="Escribe aquí..."></textarea>
+        <div class="noteGrip" title="Redimensaionar">◢</div>
     `
 
     // Cycle to the next color and save
@@ -160,6 +194,7 @@ function createNote({ x, y, text = '', color = NOTE_COLORS[0], title = '' }) {
     })
 
     makeDraggable(note, note.querySelector('.noteHeader'), saveNotes)
+    makeResizable(note, note.querySelector('.noteGrip'), saveNotes)
     canvas.appendChild(note)
     clampToCanvas(note)
     textarea.focus()
