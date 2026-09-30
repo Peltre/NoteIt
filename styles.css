@@ -156,6 +156,17 @@ button:hover {
     pointer-events: none;
 }
 
+.colorNote {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.35);
+}
+
+.colorNote:hover {
+    background: rgba(0, 0, 0, 0.12);
+}
+
 /* 5. Shared: drag cursors */
 
 .noteHeader,

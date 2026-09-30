@@ -6,6 +6,8 @@ const addNoteBtn = document.getElementById('addNote')
 let noteCount = 0
 let dragging = false
 
+const NOTE_COLORS = ['#fff59d', '#ffcc80', '#a5d6a7', '#90caf9', '#f8bbd0']
+
 // 2. Position & drag utilities
 
 // Make bounds so post-its cant escape the canvas
@@ -103,24 +105,40 @@ function saveNotes() {
     const notes = [...canvas.querySelectorAll('.note')].map(note => ({
         x: parseInt(note.style.left),
         y: parseInt(note.style.top),
-        text: note.querySelector('textarea').value
+        text: note.querySelector('textarea').value,
+        color: note.dataset.color
     }))
     window.api.saveNotes(notes)
 }
 
+// Aux function to set note color
+function setNoteColor(note, color) {
+    note.dataset.color = color
+    note.style.background = color
+}
+
 // Function to create a note
-function createNote(x, y, text = '') {
+function createNote({ x, y, text = '', color = NOTE_COLORS[0] }) {
     const note = document.createElement('div')
     note.className = 'note interactive'
     note.style.left = x + 'px'
     note.style.top = y + 'px'
+    setNoteColor(note, color)
 
     note.innerHTML = `
         <div class="noteHeader">
+            <button class="colorNote" title="Cambiar color">●</button>
             <button class="deleteNote" title="Eliminar">✕</button>
         </div>
         <textarea placeholder="Escribe aquí..."></textarea>
     `
+
+    // Cycle to the next color and save
+    note.querySelector('.colorNote').addEventListener('click', () => {
+        const next = (NOTE_COLORS.indexOf(note.dataset.color) + 1) % NOTE_COLORS.length
+        setNoteColor(note, NOTE_COLORS[next])
+        saveNotes()
+    })
 
     // load initial text and save whenever the user types
     const textarea = note.querySelector('textarea')
@@ -142,13 +160,15 @@ function createNote(x, y, text = '') {
 // New segmented function for adding notes (will be used for shortcuts)
 function addNote() {
     noteCount++
-    createNote(120 + noteCount * 30, 120 + noteCount * 30)
+    createNote({ x: 120 + noteCount * 30, y: 120 + noteCount * 30})
+    saveNotes()
 }
 
 // Load on start
 async function loadNotes() {
     const saved = await window.api.loadNotes()
-    saved.forEach(n => createNote(n.x, n.y, n.text))
+    saved.forEach(createNote)
+    saveNotes()
 }
 
 // 5. Master bar
