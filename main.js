@@ -111,6 +111,11 @@ function createCanvas() {
     globalShortcut.register('CommandOrControl+Shift+H', () => {
         canvas.webContents.send('notes:toggle')
     })
+
+    // Shortcut to toggle masterBar visibility
+    globalShortcut.register('CommandOrControl+Alt+B', () => {
+        canvas.webContents.send('bar:toggle')
+    })
 }
 
 // 4. App lifecycle

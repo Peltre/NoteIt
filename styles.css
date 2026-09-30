@@ -78,6 +78,11 @@ html, body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
+.masterBar.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
 button {
     background: transparent;
     border: none;

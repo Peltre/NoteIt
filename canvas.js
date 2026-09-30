@@ -170,6 +170,10 @@ function toggleNotes() {
     toggleNotesBtn.textContent = notesVisible ? '👁' : '-'
 }
 
+function toggleBar() {
+    masterBar.classList.toggle('hidden')
+}
+
 toggleNotesBtn.addEventListener('click', toggleNotes)
 
 const editCanvasBtn = document.getElementById('editCanvas')
@@ -201,6 +205,7 @@ window.addEventListener('resize', () => {
 // global shortcut activation
 window.api.onAddNote(addNote)
 window.api.onToggleNotes(toggleNotes)
+window.api.onToggleBar(toggleBar)
 
 // 8. Startup
 
