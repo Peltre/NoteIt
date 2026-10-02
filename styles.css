@@ -107,8 +107,6 @@ button:hover {
 
 .note {
     position: absolute;
-    width: 220px;
-    height: 200px;
     background: #fff59d;
     border-radius: 8px;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
@@ -116,6 +114,50 @@ button:hover {
     flex-direction: column;
     overflow: hidden;
     transition: opacity 0.2s, transform 0.2s;
+}
+
+/* Scrollable body: text + checklist */
+.noteBody {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.noteBody::-webkit-scrollbar {
+    width: 6px;
+}
+
+.noteBody::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.noteBody::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 3px;
+}
+
+.noteBody::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Main text: grows with its content */
+.noteText {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+    border: none;
+    background: transparent;
+    resize: none;
+    padding: 10px 10px 0;
+    line-height: 20px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #333;
+    outline: none;
 }
 
 .noteHeader {
@@ -157,18 +199,6 @@ button:hover {
     background: rgba(0, 0, 0, 0.12);
 }
 
-.note textarea {
-    flex: 1;
-    border: none;
-    background: transparent;
-    resize: none;
-    padding: 10px;
-    font-family: inherit;
-    font-size: 14px;
-    color: #333;
-    outline: none;
-}
-
 .notesHidden .note {
     opacity: 0;
     transform: scale(0.95);
@@ -200,7 +230,63 @@ button:hover {
     user-select: none;
 }
 
+/* list button in note header */
+.listNote {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.35);
+}
 
+.listNote:hover {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+/* Checklist below the text */
+.noteList {
+    flex: 0 0 auto;
+    padding: 20px 10px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.noteList:empty {
+    display: none;
+}
+
+.noteItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.itemCheck {
+    margin: 5px 0 0;
+    accent-color: #333;
+    cursor: pointer;
+}
+
+.itemText {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0;
+    border: none;
+    background: transparent;
+    resize: none;
+    overflow: hidden;
+    line-height: 20px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+}
+
+.noteItem.done .itemText {
+    text-decoration: line-through;
+    color: rgba(0, 0, 0, 0.4);
+}
 
 /* 5. Shared: drag cursors */
 
