@@ -24,16 +24,11 @@ function boundsVisible(bounds) {
     return screen.getAllDisplays().some(({ workArea: wa }) =>
         bounds.x < wa.x + wa.width &&
         bounds.x + bounds.width > wa.x &&
-        bounds.y < wa.y + bounds.height &&
+        bounds.y < wa.y + wa.height &&
         bounds.y + bounds.height > wa.y
     )
 }
 
-// Helper for when another opened app has the same global shortcut as noteIt
-function registerShortcut(accelerator, channel) {
-    const ok = globalShortcut.register(accelerator, () => canvas.webContents.send(channel))
-    if (!ok) console.warn(`Shortcut ${accelerator} is already in use`)
-}
 
 // 3. Canvas window
 
@@ -120,6 +115,12 @@ function createCanvas() {
     })
 
     // 3.6 Global shortcuts
+
+    // Helper for when another opened app has the same global shortcut as noteIt
+    function registerShortcut(accelerator, channel) {
+        const ok = globalShortcut.register(accelerator, () => canvas.webContents.send(channel))
+        if (!ok) console.warn(`Shortcut ${accelerator} is already in use`)
+    }
 
     // Shortcut to create a new note
     registerShortcut('CommandOrControl+Shift+C', 'notes:add')
