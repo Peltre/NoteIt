@@ -5,13 +5,23 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <svg style="display: none">
+    <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="icon-eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.5 5.2A10 10 0 0 1 22 12s-1 2-3 3.8M6.6 6.6C3.6 8.4 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.3-1"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="icon-drop" viewBox="0 0 24 24"><path d="M12 3s6.5 7.5 6.5 12a6.5 6.5 0 0 1-13 0C5.5 10.5 12 3 12 3z"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="icon-frame" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" stroke-dasharray="3 3"/></symbol>
+    <symbol id="icon-grip" viewBox="0 0 24 24"><path d="M20 10L10 20M20 16l-4 4"/></symbol>
+  </svg>
   <div id="canvas">
 
     <div class="masterBar interactive">
-      <button id="addNote" title="Agregar post-it">＋</button>
-      <button id="toggleNotes" title="Mostrar / ocultar">👁</button>
-      <button id="editCanvas" title="Ajustar lienzo">⬚</button>
-      <button id="Close" class="close" onclick="window.close()">✕</button>
+      <button id="addNote" title="Agregar post-it"><svg><use href="#icon-plus"/></svg></button>
+      <button id="toggleNotes" title="Mostrar / ocultar"><svg><use href="#icon-eye"/></svg></button>
+      <button id="editCanvas" title="Ajustar lienzo"><svg><use href="#icon-frame"/></svg></button>
+      <button id="Close" class="close" title="Cerrar" onclick="window.close()"><svg><use href="#icon-x"/></svg></button>
     </div>
 
     <div id="moveHandle" class="canvasHandle interactive" title="Mover lienzo">✥ Mover</div>

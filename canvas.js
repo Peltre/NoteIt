@@ -253,15 +253,15 @@ function createNote({ x, y, text = '', color = NOTE_COLORS[0], title = '', width
     note.innerHTML = `
         <div class="noteHeader">
             <input class="noteTitle" placeholder="Título" spellcheck="false">
-            <button class="listNote" title="Agregar lista">☑</button>
-            <button class="colorNote" title="Cambiar color">●</button>
-            <button class="deleteNote" title="Eliminar">✕</button>
+            <button class="listNote" title="Agregar lista"><svg><use href="#icon-check"/></svg></button>
+            <button class="colorNote" title="Cambiar color"><svg><use href="#icon-drop"/></svg></button>
+            <button class="deleteNote" title="Eliminar"><svg><use href="#icon-x"/></svg></button>
         </div>
         <div class="noteBody">
             <textarea class="noteText" placeholder="Escribe aquí..." rows="1"></textarea>
             <div class="noteList"></div>
         </div>
-        <div class="noteGrip" title="Redimensionar">◢</div>
+        <div class="noteGrip" title="Redimensionar"><svg><use href="#icon-grip"/></svg></div>
     `
 
     // Cycle to the next color and save
@@ -337,7 +337,7 @@ let notesVisible = true
 function toggleNotes() {
     notesVisible = !notesVisible
     canvas.classList.toggle('notesHidden', !notesVisible)
-    toggleNotesBtn.textContent = notesVisible ? '👁' : '-'
+    toggleNotesBtn.querySelector('use').setAttribute('href', notesVisible ? '#icon-eye' : '#icon-eye-off')
 }
 
 function toggleBar() {

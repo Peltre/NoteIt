@@ -1,5 +1,17 @@
 /* 0. Design variables */
 
+@font-face {
+    font-family: 'Kalam';
+    src: url('assets/fonts/Kalam-Regular.ttf') format('truetype');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Kalam';
+    src: url('assets/fonts/Kalam-Bold.ttf') format('truetype');
+    font-weight: 700;
+}
+
 :root {
     --ink: #333;
     --ink-soft: rgba(0, 0, 0, 0.4);
@@ -17,7 +29,12 @@
     --radius-note: 8px;
     --shadow-note: 0 6px 16px rgba(0, 0, 0, 0.25);
     --shadow-bar: 0 4px 12px rgba(0, 0, 0, 0.35);
-    --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font: 'Kalam', 'Segoe UI', cursive;
+    --line-h: 24px;
+    --text-size: 16px;
+    --title-size: 19px;
+    --rule: rgba(0, 0, 0, 0.07);
+    --check-size: 15px;
 }
 
 /* 1. Base */
@@ -107,6 +124,9 @@ html, body {
 }
 
 button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: none;
     color: var(--bar-ink);
@@ -126,6 +146,38 @@ button:hover {
     background: var(--danger);
 }
 
+/* Shared icon styling */
+/* Shared icon styling */
+button svg,
+.noteGrip svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.noteGrip {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-faint);
+    cursor: nwse-resize;
+    user-select: none;
+}
+
+.noteGrip svg {
+    width: 10px;
+    height: 10px;
+}
+
 /* 4. Notes */
 
 .note {
@@ -139,6 +191,63 @@ button:hover {
     transition: opacity 0.2s, transform 0.2s;
 }
 
+.notesHidden .note {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+}
+
+/* Header: title + actions */
+.noteHeader {
+    height: 34px;
+    background: var(--overlay);
+    display: flex;
+    align-items: center;
+    padding: 0 6px 0 14px;
+    gap: 2px;
+}
+
+.noteTitle {
+    flex: 1;
+    min-width: 0;
+    padding: 3px 0 0;
+    line-height: 1;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: var(--title-size);
+    font-weight: 700;
+    color: var(--ink);
+    outline: none;
+    cursor: text;
+}
+
+.noteTitle::placeholder {
+    color: var(--ink-faint);
+    font-weight: 400;
+}
+
+.noteHeader button {
+    width: 26px;
+    height: 26px;
+    color: var(--ink-faint);
+    transition: background 0.15s, color 0.15s;
+}
+
+.noteHeader button svg {
+    width: 15px;
+    height: 15px;
+}
+
+.noteHeader button:hover {
+    background: var(--overlay-hover);
+    color: var(--ink);
+}
+
+.deleteNote:hover {
+    color: var(--danger);
+}
+
 /* Scrollable body: text + checklist */
 .noteBody {
     flex: 1;
@@ -146,6 +255,15 @@ button:hover {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    padding-top: 4px;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0 calc(var(--line-h) - 1px),
+        var(--rule) calc(var(--line-h) - 1px) var(--line-h)
+    );
+    background-origin: content-box;
+    background-clip: content-box;
+    background-attachment: local;
 }
 
 .noteBody::-webkit-scrollbar {
@@ -175,103 +293,21 @@ button:hover {
     border: none;
     background: transparent;
     resize: none;
-    padding: 10px 10px 0;
-    line-height: 20px;
+    padding: 0 14px 0;
+    line-height: var(--line-h);
     font-family: inherit;
-    font-size: 14px;
+    font-size: var(--text-size);
     color: var(--ink);
     outline: none;
-}
-
-.noteHeader {
-    height: 28px;
-    background: var(--overlay);
-    display: flex;
-    align-items: center;
-    padding: 0 4px 0 10px;
-    gap: 2px;
-}
-
-.noteTitle {
-    flex: 1;
-    min-width: 0;
-    padding: 0;
-    border: none;
-    background: transparent;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink);
-    outline: none;
-    cursor: text;
-}
-
-.noteTitle::placeholder {
-    color: var(--ink-faint);
-    font-weight: 400;
-}
-
-.deleteNote {
-    width: 24px;
-    height: 24px;
-    font-size: 13px;
-    color: var(--ink);
-}
-
-.deleteNote:hover {
-    background: var(--overlay-hover);
-}
-
-.notesHidden .note {
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
-}
-
-.colorNote {
-    width: 24px;
-    height: 24px;
-    font-size: 14px;
-    color: var(--ink-faint);
-}
-
-.colorNote:hover {
-    background: var(--overlay-hover);
-}
-
-.noteGrip {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 16px;
-    height: 16px;
-    font-size: 10px;
-    line-height: 16px;
-    text-align: center;
-    color: var(--ink-faint);
-    cursor: nwse-resize;
-    user-select: none;
-}
-
-/* list button in note header */
-.listNote {
-    width: 24px;
-    height: 24px;
-    font-size: 14px;
-    color: var(--ink-faint);
-}
-
-.listNote:hover {
-    background: var(--overlay-hover);
 }
 
 /* Checklist below the text */
 .noteList {
     flex: 0 0 auto;
-    padding: 20px 10px 8px;
+    padding: var(--line-h) 14px 12px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0;
 }
 
 .noteList:empty {
@@ -285,9 +321,39 @@ button:hover {
 }
 
 .itemCheck {
-    margin: 5px 0 0;
-    accent-color: var(--ink);
+    appearance: none;
+    background: transparent;
+    flex: 0 0 auto;
+    position: relative;
+    box-sizing: border-box;
+    width: var(--check-size);
+    height: var(--check-size);
+    margin-top: calc((var(--line-h) - var(--check-size)) / 2);
+    border: 2px solid var(--ink-faint);
+    border-radius: 4px;
     cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.itemCheck:hover {
+    border-color: var(--ink);
+}
+
+.itemCheck:checked {
+    background: var(--ink);
+    border-color: var(--ink);
+}
+
+.itemCheck:checked::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0;
+    width: 3px;
+    height: 7px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
 }
 
 .itemText {
@@ -299,16 +365,32 @@ button:hover {
     background: transparent;
     resize: none;
     overflow: hidden;
-    line-height: 20px;
+    line-height: var(--line-h);
     font-family: inherit;
-    font-size: 14px;
+    font-size: var(--text-size);
     color: var(--ink);
     outline: none;
+    transform: translateY(2px);
 }
 
 .noteItem.done .itemText {
     text-decoration: line-through;
     color: var(--ink-soft);
+}
+
+/* Resize grip */
+.noteGrip {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+    color: var(--ink-faint);
+    cursor: nwse-resize;
+    user-select: none;
 }
 
 /* 5. Shared: drag cursors */
