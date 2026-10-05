@@ -6,15 +6,33 @@ const fs = require('fs')
 
 let tray = null
 
+const settingsPath = path.join(app.getPath('userData'), 'settings.json')
+const dataPath = path.join(app.getPath('userData'), 'notes.json')
+
 // 2. Settings helpers
 
 function loadBounds() {
-    const settingsPath = path.join(app.getPath('userData'), 'settings.json')
     try {
         return JSON.parse(fs.readFileSync(settingsPath, 'utf-8')).bounds
     } catch {
         return null
     }
+}
+
+// helper when opening save file from a unplugged monitor / invisible canvas error
+function boundsVisible(bounds) {
+    return screen.getAllDisplays().some(({ workArea: wa }) =>
+        bounds.x < wa.x + wa.width &&
+        bounds.x + bounds.width > wa.x &&
+        bounds.y < wa.y + bounds.height &&
+        bounds.y + bounds.height > wa.y
+    )
+}
+
+// Helper for when another opened app has the same global shortcut as noteIt
+function registerShortcut(accelerator, channel) {
+    const ok = globalShortcut.register(accelerator, () => canvas.webContents.send(channel))
+    if (!ok) console.warn(`Shortcut ${accelerator} is already in use`)
 }
 
 // 3. Canvas window
@@ -24,11 +42,9 @@ function createCanvas() {
     // 3.1 Paths & initial bounds
 
     // New dynamic way to obtain canvasSize if modified from initial (screen size)
-    const bounds = loadBounds() || screen.getPrimaryDisplay().workArea
+    const saved = loadBounds()
+    const bounds = saved && boundsVisible(saved) ? saved : screen.getPrimaryDisplay().workArea
     const { x, y, width, height } = bounds
-    const settingsPath = path.join(app.getPath('userData'), 'settings.json')
-
-    const dataPath = path.join(app.getPath('userData'), 'notes.json')
 
     // 3.2 Window creation
 
@@ -106,19 +122,9 @@ function createCanvas() {
     // 3.6 Global shortcuts
 
     // Shortcut to create a new note
-    globalShortcut.register('CommandOrControl+Shift+C', () => {
-        canvas.webContents.send('notes:add')
-    })
-
-    // Shortcut to toggle note visibiliy
-    globalShortcut.register('CommandOrControl+Shift+H', () => {
-        canvas.webContents.send('notes:toggle')
-    })
-
-    // Shortcut to toggle masterBar visibility
-    globalShortcut.register('CommandOrControl+Alt+B', () => {
-        canvas.webContents.send('bar:toggle')
-    })
+    registerShortcut('CommandOrControl+Shift+C', 'notes:add')
+    registerShortcut('CommandOrControl+Shift+H', 'notes:toggle')
+    registerShortcut('CommandOrControl+Alt+B', 'bar:toggle')
 
     // 3.7 System tray
     tray = new Tray(path.join(__dirname, 'assets', 'icon.ico'))
