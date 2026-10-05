@@ -335,7 +335,7 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     let confirmTimer = null
 
     deleteBtn.addEventListener('click', () => {
-        const isEmpty = titleInput.value.trim === '' &&
+        const isEmpty = titleInput.value.trim() === '' &&
             getBlocks(note).every(block => block.text.trim() === '')
 
         if (isEmpty || deleteBtn.classList.contains('confirm')) {
@@ -379,11 +379,11 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     canvas.appendChild(note)
     clampToCanvas(note)
     if (collapsed) setCollapsed(note, true)
+    note.querySelectorAll('textarea').forEach(autoGrow)
 
     new ResizeObserver(() => {
         note.querySelectorAll('textarea').forEach(autoGrow)
     }).observe(note)
-    note.querySelector('.blockText').focus()
 
     return note
 }
@@ -391,7 +391,7 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
 // New segmented function for adding notes (will be used for shortcuts)
 function addNote() {
     noteCount++
-    createNote({ x: 120 + noteCount * 30, y: 120 + noteCount * 30})
+    const note = createNote({ x: 120 + noteCount * 30, y: 120 + noteCount * 30 })
     focusBlock(note.querySelector('.block'))
     saveNotes()
 }
