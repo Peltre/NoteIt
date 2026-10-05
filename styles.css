@@ -234,6 +234,11 @@ button svg,
     color: var(--danger);
 }
 
+.noteHeader .deleteNote.confirm {
+    background: var(--danger);
+    color: #fff;
+}
+
 /* Collapse: animated height, chevron rotates */
 .note.animating {
     transition: height 0.25s ease;

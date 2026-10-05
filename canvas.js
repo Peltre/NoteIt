@@ -330,10 +330,27 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     titleInput.value = title
     titleInput.addEventListener('input', saveNotes)
 
-    // del note and save
-    note.querySelector('.deleteNote').addEventListener('click', () => {
-        note.remove()
-        saveNotes()
+    // Delete note: asks for a second click unless note is empty
+    const deleteBtn = note.querySelector('.deleteNote')
+    let confirmTimer = null
+
+    deleteBtn.addEventListener('click', () => {
+        const isEmpty = titleInput.value.trim === '' &&
+            getBlocks(note).every(block => block.text.trim() === '')
+
+        if (isEmpty || deleteBtn.classList.contains('confirm')) {
+            clearTimeout(confirmTimer)
+            note.remove()
+            saveNotes()
+            return
+        }
+
+        deleteBtn.classList.add('confirm')
+        deleteBtn.title = 'Click de nuevo para borrar'
+        confirmTimer = setTimeout(() => {
+            deleteBtn.classList.remove('confirm')
+            deleteBtn.title = 'Eliminar'
+        }, 3000)
     })
 
     // Blocks: migrate old notes, and never leave a note empty
