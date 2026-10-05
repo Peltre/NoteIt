@@ -188,8 +188,10 @@ button svg,
 }
 
 .noteTitle {
-    flex: 1;
-    min-width: 0;
+    flex: 0 1 auto;
+    field-sizing: content;
+    min-width: 40px;
+    max-width: 100%;
     padding: 3px 0 0;
     line-height: 1;
     border: none;
@@ -212,6 +214,10 @@ button svg,
     height: 26px;
     color: var(--ink-faint);
     transition: background 0.15s, color 0.15s;
+}
+
+.noteHeader .listNote {
+    margin-left: auto;
 }
 
 .noteHeader button svg {
