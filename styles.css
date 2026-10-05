@@ -1,3 +1,25 @@
+/* 0. Design variables */
+
+:root {
+    --ink: #333;
+    --ink-soft: rgba(0, 0, 0, 0.4);
+    --ink-faint: rgba(0, 0, 0, 0.3);
+    --overlay: rgba(0, 0, 0, 0.08);
+    --overlay-hover: rgba(0, 0, 0, 0.12);
+    --scroll-thumb: rgba(0, 0, 0, 0.18);
+    --bar-bg: rgba(30, 30, 35, 0.92);
+    --bar-ink: #eee;
+    --bar-hover: rgba(255, 255, 255, 0.15);
+    --danger: #e5484d;
+    --accent: rgba(255, 200, 0, 0.9);
+    --accent-border: rgba(255, 200, 0, 0.8);
+    --accent-tint: rgba(255, 200, 0, 0.06);
+    --radius-note: 8px;
+    --shadow-note: 0 6px 16px rgba(0, 0, 0, 0.25);
+    --shadow-bar: 0 4px 12px rgba(0, 0, 0, 0.35);
+    --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 /* 1. Base */
 
 html, body {
@@ -5,7 +27,7 @@ html, body {
     height: 100%;
     background: transparent;
     overflow: hidden;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font);
 }
 
 /* 2. Canvas & edit mode */
@@ -18,14 +40,14 @@ html, body {
 }
 
 #canvas.editing {
-    border: 2px dashed rgba(255, 200, 0, 0.8);
-    background: rgba(255, 200, 0, 0.06);
+    border: 2px dashed var(--accent-border);
+    background: var(--accent-tint);
 }
 
 .canvasHandle {
     display: none;
     position: absolute;
-    background: rgba(255, 200, 0, 0.9);
+    background: var(--accent);
     color: #222;
     font-size: 13px;
     font-weight: 600;
@@ -51,7 +73,7 @@ html, body {
     right: 0;
     width: 28px;
     height: 28px;
-    border-radius: 8px 0 0 0;
+    border-radius: var(--radius-note) 0 0 0;
     cursor: nwse-resize;
 }
 
@@ -73,9 +95,10 @@ html, body {
     display: flex;
     gap: 4px;
     padding: 4px 8px;
-    background: rgba(30, 30, 35, 0.92);
+    background: var(--bar-bg);
     border-radius: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--shadow-bar);
+    transition: opacity 0.2s;
 }
 
 .masterBar.hidden {
@@ -86,7 +109,7 @@ html, body {
 button {
     background: transparent;
     border: none;
-    color: #eee;
+    color: var(--bar-ink);
     font-size: 18px;
     width: 40px;
     height: 40px;
@@ -96,11 +119,11 @@ button {
 }
 
 button:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--bar-hover);
 }
 
 .close:hover {
-    background: #e5484d;
+    background: var(--danger);
 }
 
 /* 4. Notes */
@@ -108,8 +131,8 @@ button:hover {
 .note {
     position: absolute;
     background: #fff59d;
-    border-radius: 8px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    border-radius: var(--radius-note);
+    box-shadow: var(--shadow-note);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -134,12 +157,12 @@ button:hover {
 }
 
 .noteBody::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.18);
+    background: var(--scroll-thumb);
     border-radius: 3px;
 }
 
 .noteBody::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--ink-faint);
 }
 
 /* Main text: grows with its content */
@@ -156,13 +179,13 @@ button:hover {
     line-height: 20px;
     font-family: inherit;
     font-size: 14px;
-    color: #333;
+    color: var(--ink);
     outline: none;
 }
 
 .noteHeader {
     height: 28px;
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--overlay);
     display: flex;
     align-items: center;
     padding: 0 4px 0 10px;
@@ -178,13 +201,13 @@ button:hover {
     font-family: inherit;
     font-size: 13px;
     font-weight: 600;
-    color: #333;
+    color: var(--ink);
     outline: none;
     cursor: text;
 }
 
 .noteTitle::placeholder {
-    color: rgba(0, 0, 0, 0.3);
+    color: var(--ink-faint);
     font-weight: 400;
 }
 
@@ -192,11 +215,11 @@ button:hover {
     width: 24px;
     height: 24px;
     font-size: 13px;
-    color: #555;
+    color: var(--ink);
 }
 
 .deleteNote:hover {
-    background: rgba(0, 0, 0, 0.12);
+    background: var(--overlay-hover);
 }
 
 .notesHidden .note {
@@ -209,11 +232,11 @@ button:hover {
     width: 24px;
     height: 24px;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.35);
+    color: var(--ink-faint);
 }
 
 .colorNote:hover {
-    background: rgba(0, 0, 0, 0.12);
+    background: var(--overlay-hover);
 }
 
 .noteGrip {
@@ -225,7 +248,7 @@ button:hover {
     font-size: 10px;
     line-height: 16px;
     text-align: center;
-    color: rgba(0, 0, 0, 0.3);
+    color: var(--ink-faint);
     cursor: nwse-resize;
     user-select: none;
 }
@@ -235,11 +258,11 @@ button:hover {
     width: 24px;
     height: 24px;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.35);
+    color: var(--ink-faint);
 }
 
 .listNote:hover {
-    background: rgba(0, 0, 0, 0.12);
+    background: var(--overlay-hover);
 }
 
 /* Checklist below the text */
@@ -263,7 +286,7 @@ button:hover {
 
 .itemCheck {
     margin: 5px 0 0;
-    accent-color: #333;
+    accent-color: var(--ink);
     cursor: pointer;
 }
 
@@ -279,13 +302,13 @@ button:hover {
     line-height: 20px;
     font-family: inherit;
     font-size: 14px;
-    color: #333;
+    color: var(--ink);
     outline: none;
 }
 
 .noteItem.done .itemText {
     text-decoration: line-through;
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--ink-soft);
 }
 
 /* 5. Shared: drag cursors */
