@@ -1,8 +1,10 @@
 // 1. Imports
 
-const { app, BrowserWindow, screen, ipcMain, globalShortcut } = require('electron')
+const { app, BrowserWindow, screen, ipcMain, globalShortcut, Tray, Menu } = require('electron')
 const path = require('path')
 const fs = require('fs')
+
+let tray = null
 
 // 2. Settings helpers
 
@@ -37,6 +39,7 @@ function createCanvas() {
         resizable: true,
         hasShadow: false,
         alwaysOnTop: true,
+        skipTaskbar: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
         }
@@ -116,6 +119,20 @@ function createCanvas() {
     globalShortcut.register('CommandOrControl+Alt+B', () => {
         canvas.webContents.send('bar:toggle')
     })
+
+    // 3.7 System tray
+    tray = new Tray(path.join(__dirname, 'assets', 'icon.ico'))
+    tray.setToolTip('NoteIt')
+
+    tray.setContextMenu(Menu.buildFromTemplate([
+        { label: 'Nueva nota', click: () => canvas.webContents.send('notes:add') },
+        { label: 'Mostrar / ocultar notas', click: () => canvas.webContents.send('notes:toggle') },
+        { label: 'Mostrar / ocultar barra', click: () => canvas.webContents.send('bar:toggle') },
+        { type: 'separator' },
+        { label: 'Salir', click: () => app.quit() } 
+    ]))
+
+    tray.on('click', () => canvas.webContents.send('bar:toggle')) // left click toggles master bar
 }
 
 // 4. App lifecycle
