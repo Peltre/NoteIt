@@ -26,6 +26,7 @@
     --accent: rgba(255, 200, 0, 0.9);
     --accent-border: rgba(255, 200, 0, 0.8);
     --accent-tint: rgba(255, 200, 0, 0.06);
+    --rule: rgba(0, 0, 0, 0.07);
     --radius-note: 8px;
     --shadow-note: 0 6px 16px rgba(0, 0, 0, 0.25);
     --shadow-bar: 0 4px 12px rgba(0, 0, 0, 0.35);
@@ -33,7 +34,6 @@
     --line-h: 24px;
     --text-size: 16px;
     --title-size: 19px;
-    --rule: rgba(0, 0, 0, 0.07);
     --check-size: 15px;
 }
 
@@ -130,7 +130,6 @@ button {
     background: transparent;
     border: none;
     color: var(--bar-ink);
-    font-size: 18px;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -147,7 +146,6 @@ button:hover {
 }
 
 /* Shared icon styling */
-/* Shared icon styling */
 button svg,
 .noteGrip svg {
     width: 20px;
@@ -157,25 +155,6 @@ button svg,
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
-}
-
-.noteGrip {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--ink-faint);
-    cursor: nwse-resize;
-    user-select: none;
-}
-
-.noteGrip svg {
-    width: 10px;
-    height: 10px;
 }
 
 /* 4. Notes */
@@ -199,7 +178,7 @@ button svg,
 
 /* Header: title + actions */
 .noteHeader {
-    height: 34px;
+    height: 38px;
     background: var(--overlay);
     display: flex;
     align-items: center;
@@ -248,14 +227,14 @@ button svg,
     color: var(--danger);
 }
 
-/* Scrollable body: text + checklist */
+/* Scrollable body: a column of blocks */
 .noteBody {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    padding-top: 4px;
+    padding: 4px 0 12px;
     background-image: repeating-linear-gradient(
         to bottom,
         transparent 0 calc(var(--line-h) - 1px),
@@ -283,44 +262,24 @@ button svg,
     background: var(--ink-faint);
 }
 
-/* Main text: grows with its content */
-.noteText {
-    flex: 0 0 auto;
-    box-sizing: border-box;
-    width: 100%;
-    min-height: 0;
-    overflow: hidden;
-    border: none;
-    background: transparent;
-    resize: none;
-    padding: 0 14px 0;
-    line-height: var(--line-h);
-    font-family: inherit;
-    font-size: var(--text-size);
-    color: var(--ink);
-    outline: none;
-}
-
-/* Checklist below the text */
-.noteList {
-    flex: 0 0 auto;
-    padding: var(--line-h) 14px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.noteList:empty {
-    display: none;
-}
-
-.noteItem {
+/* One block: optional checkbox + text */
+.block {
     display: flex;
     align-items: flex-start;
     gap: 6px;
+    padding: 0 14px;
 }
 
-.itemCheck {
+.block[data-type="text"] .blockCheck {
+    display: none;
+}
+
+/* placeholder only on a lonely empty block */
+.block:not(:only-child) .blockText::placeholder {
+    color: transparent;
+}
+
+.blockCheck {
     appearance: none;
     background: transparent;
     flex: 0 0 auto;
@@ -335,16 +294,16 @@ button svg,
     transition: background 0.15s, border-color 0.15s;
 }
 
-.itemCheck:hover {
+.blockCheck:hover {
     border-color: var(--ink);
 }
 
-.itemCheck:checked {
+.blockCheck:checked {
     background: var(--ink);
     border-color: var(--ink);
 }
 
-.itemCheck:checked::after {
+.blockCheck:checked::after {
     content: '';
     position: absolute;
     left: 3px;
@@ -356,7 +315,7 @@ button svg,
     transform: rotate(45deg);
 }
 
-.itemText {
+.blockText {
     flex: 1;
     min-width: 0;
     box-sizing: border-box;
@@ -370,10 +329,10 @@ button svg,
     font-size: var(--text-size);
     color: var(--ink);
     outline: none;
-    transform: translateY(2px);
+    transform: translateY(1px);
 }
 
-.noteItem.done .itemText {
+.block.done .blockText {
     text-decoration: line-through;
     color: var(--ink-soft);
 }
@@ -385,12 +344,17 @@ button svg,
     right: 0;
     width: 16px;
     height: 16px;
-    font-size: 10px;
-    line-height: 16px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--ink-faint);
     cursor: nwse-resize;
     user-select: none;
+}
+
+.noteGrip svg {
+    width: 10px;
+    height: 10px;
 }
 
 /* 5. Shared: drag cursors */

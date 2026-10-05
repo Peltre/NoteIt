@@ -135,12 +135,11 @@ function saveNotes() {
     const notes = [...canvas.querySelectorAll('.note')].map(note => ({
         x: parseInt(note.style.left),
         y: parseInt(note.style.top),
-        text: note.querySelector('.noteText').value,
         color: note.dataset.color,
         title: note.querySelector('.noteTitle').value,
         width: note.offsetWidth,
         height: note.offsetHeight,
-        items: getItems(note)
+        blocks: getBlocks(note)
     }))
     window.api.saveNotes(notes)
 }
@@ -151,26 +150,56 @@ function setNoteColor(note, color) {
     note.style.background = color
 }
 
-// Function to read the items of a list note from its rows
-function getItems(note) {
-    return [...note.querySelectorAll('.noteItem')].map(row => ({
-        text: row.querySelector('.itemText').value,
-        done: row.querySelector('.itemCheck').checked
-    }))
+// NEW BLOCK IMPLEMENTATION
+// Replaces items and lists, now notes are made up by blocks with different types 
+// starting off by just Text / Check
+
+// Read the block of a note from its rows
+function getBlocks(note) {
+    return [...note.querySelectorAll('.block')].map(row => {
+        const block = { type: row.dataset.type, text: row.querySelector('.blockText').value }
+        if (block.type === 'item') block.done = row.querySelector('.blockCheck').checked
+        return block
+    })
 }
 
-// Add one item row into a list note
-function addItemRow(note, { text = '', done = false }, after = null) {
+// Convert old notes into blocks
+function migrateBlocks({ text = '', items = []}) {
+    const blocks = text.split('\n').filter(line => line.trim() !== '').map(line => ({ type: 'text', text: line }))
+    items.forEach(item => blocks.push({ type: 'item', text: item.text, done: item.done }))
+    return blocks
+}
+
+// Switch a block between text and checkbox item
+function setBlockType(row, type) {
+    row.dataset.type = type
+    if (type === 'text') {
+        row.querySelector('.blockCheck').checked = false
+        row.classList.remove('done')
+    }
+}
+
+// Focus a block's text and put the caret at the start or the end
+function focusBlock(row, atEnd = true) {
+    const input = row.querySelector('.blockText')
+    input.focus()
+    const pos = atEnd ? input.value.length : 0
+    input.setSelectionRange(pos, pos)
+}
+
+// Add one block row (text or checkbox) to a note
+function addBlock(note, { type ='text', text = '', done = false}, after = null) {
     const row = document.createElement('div')
-    row.className = 'noteItem'
-    row.classList.toggle('done', done)
+    row.className = 'block'
+    row.dataset.type = type
+    row.classList.toggle('done', type === 'item' && done)
     row.innerHTML = `
-        <input type="checkbox" class="itemCheck">
-        <textarea class="itemText" placeholder="Nuevo elemento" rows="1" spellcheck="false"></textarea>
+        <input type="checkbox" class="blockCheck">
+        <textarea class="blockText" rows="1" spellcheck="false" placeholder="Escribe aquí..."></textarea>
     `
 
-    const check = row.querySelector('.itemCheck')
-    const input = row.querySelector('.itemText')
+    const check = row.querySelector('.blockCheck')
+    const input = row.querySelector('.blockText')
     check.checked = done
     input.value = text
 
@@ -184,54 +213,57 @@ function addItemRow(note, { text = '', done = false }, after = null) {
         saveNotes()
     })
 
-    // one line per item for now
     input.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
+        const prev = row.previousElementSibling
+        const next = row.nextElementSibling
+        const lineH = parseFloat(getComputedStyle(input).lineHeight)
+        const singleLine = input.offsetHeight < lineH * 1.5
+
+        // Enter on an empty item: turn it into text (this is how you leave a list)
+        if (event.key === 'Enter' && !event.shiftKey && row.dataset.type === 'item' && input.value === '') {
             event.preventDefault()
-            const newRow = addItemRow(note, {}, row)
-            newRow.querySelector('.itemText').focus()
+            setBlockType(row, 'text')
             saveNotes()
+            return
         }
 
-        // backspace on and empty item removes the line
-        if (event.key === 'Backspace' && input.value === '') {
+        // Enter: new block of the same type below (Shift+Enter keeps the default: a line break)
+        if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
-            const prev = row.previousElementSibling
-            row.remove()
-            if (prev) {
-                const prevInput = prev.querySelector('.itemText')
-                prevInput.focus()
-                prevInput.setSelectionRange(prevInput.value.length, prevInput.value.length)
-            } else {
-                note.querySelector('.noteText').focus()
-            }
+            const newRow = addBlock(note, { type: row.dataset.type }, row)
+            focusBlock(newRow)
             saveNotes()
+            return
+        }
+
+        // Backspace on an empty block: remove it (never the last one)
+        if (event.key === 'Backspace' && input.value === '' && prev) {
+            event.preventDefault()
+            row.remove()
+            focusBlock(prev)
+            saveNotes()
+            return
+        }
+
+        // Arrow up / down between blocks
+        if (event.key === 'ArrowUp' && prev && (singleLine || input.selectionStart === 0)) {
+            event.preventDefault()
+            focusBlock(prev)
+        }
+        if (event.key === 'ArrowDown' && next && (singleLine || input.selectionStart === input.value.length)) {
+            event.preventDefault()
+            focusBlock(next, false)
         }
     })
 
     if (after) {
         after.insertAdjacentElement('afterend', row)
     } else {
-        note.querySelector('.noteList').appendChild(row)
+        note.querySelector('.noteBody').appendChild(row)
     }
 
     autoGrow(input)
     return row
-}
-
-// Add a list to a note, or clear it if every item is empty
-function toggleList(note) {
-    const list = note.querySelector('.noteList')
-    const items = getItems(note)
-    const allEmpty = items.length > 0 && items.every(item => item.text.trim() === '')
-
-    if (allEmpty) {
-        list.innerHTML = ''
-    } else {
-        const row = addItemRow(note, {})
-        row.querySelector('.itemText').focus()
-    }
-    saveNotes()
 }
 
 // Make textarea as tall as its content
@@ -241,7 +273,7 @@ function autoGrow(textarea) {
 }
 
 // Function to create a note
-function createNote({ x, y, text = '', color = NOTE_COLORS[0], title = '', width = 220, height = 200, items = [] }) {
+function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, height = 200, blocks, text, items }) {
     const note = document.createElement('div')
     note.className = 'note interactive'
     note.style.left = x + 'px'
@@ -253,14 +285,11 @@ function createNote({ x, y, text = '', color = NOTE_COLORS[0], title = '', width
     note.innerHTML = `
         <div class="noteHeader">
             <input class="noteTitle" placeholder="Título" spellcheck="false">
-            <button class="listNote" title="Agregar lista"><svg><use href="#icon-check"/></svg></button>
+            <button class="listNote" title="Agregar casilla"><svg><use href="#icon-check"/></svg></button>
             <button class="colorNote" title="Cambiar color"><svg><use href="#icon-drop"/></svg></button>
             <button class="deleteNote" title="Eliminar"><svg><use href="#icon-x"/></svg></button>
         </div>
-        <div class="noteBody">
-            <textarea class="noteText" placeholder="Escribe aquí..." rows="1"></textarea>
-            <div class="noteList"></div>
-        </div>
+        <div class="noteBody"></div>
         <div class="noteGrip" title="Redimensionar"><svg><use href="#icon-grip"/></svg></div>
     `
 
@@ -276,35 +305,43 @@ function createNote({ x, y, text = '', color = NOTE_COLORS[0], title = '', width
     titleInput.value = title
     titleInput.addEventListener('input', saveNotes)
 
-    // load initial text and save whenever the user types
-    const textarea = note.querySelector('.noteText')
-    textarea.value = text
-    textarea.addEventListener('input', () => {
-        autoGrow(textarea)
-        saveNotes()
-    })
-
     // del note and save
     note.querySelector('.deleteNote').addEventListener('click', () => {
         note.remove()
         saveNotes()
     })
 
-    // load items and add listener
-    items.forEach(item => addItemRow(note, item))
-    // add a list or clear it when pressing btn
-    note.querySelector('.listNote').addEventListener('click', () => toggleList(note))
+    // Blocks: migrate old notes, and never leave a note empty
+    if (!blocks) blocks = migrateBlocks({ text, items })
+    if (blocks.length === 0) blocks.push({ type: 'text' })
+    blocks.forEach(block => addBlock(note, block))
+
+    // Header button: add a checkbox block at the end
+    // Header button: toggle the type of the focused block, or add an item at the end
+    const listBtn = note.querySelector('.listNote')
+    listBtn.addEventListener('pointerdown', (event) => event.preventDefault()) // keep focus in the textarea
+    listBtn.addEventListener('click', () => {
+        const active = document.activeElement
+        const row = active?.closest('.block')
+        if (row && note.contains(row)) {
+            setBlockType(row, row.dataset.type === 'item' ? 'text' : 'item')
+            active.focus()
+        } else {
+            focusBlock(addBlock(note, { type: 'item' }))
+        }
+        saveNotes()
+    })
 
     makeDraggable(note, note.querySelector('.noteHeader'), saveNotes)
     makeResizable(note, note.querySelector('.noteGrip'), saveNotes)
     canvas.appendChild(note)
     clampToCanvas(note)
-    autoGrow(textarea)
+    note.querySelectorAll('textarea').forEach(autoGrow)
 
     new ResizeObserver(() => {
         note.querySelectorAll('textarea').forEach(autoGrow)
     }).observe(note)
-    textarea.focus()
+    note.querySelector('.blockText').focus()
 }
 
 // New segmented function for adding notes (will be used for shortcuts)
