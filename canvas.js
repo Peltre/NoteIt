@@ -130,7 +130,7 @@ document.addEventListener('mousemove', (event) => {
 
 // 4. Notes: save, create, add, load
 
-// Save function in localStorage
+// Save every note to disk (through main)
 function saveNotes() {
     const notes = [...canvas.querySelectorAll('.note')].map(note => ({
         x: parseInt(note.style.left),
@@ -150,10 +150,6 @@ function setNoteColor(note, color) {
     note.dataset.color = color
     note.style.background = color
 }
-
-// NEW BLOCK IMPLEMENTATION
-// Replaces items and lists, now notes are made up by blocks with different types 
-// starting off by just Text / Check
 
 // Read the block of a note from its rows
 function getBlocks(note) {
@@ -358,7 +354,6 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     if (blocks.length === 0) blocks.push({ type: 'text' })
     blocks.forEach(block => addBlock(note, block))
 
-    // Header button: add a checkbox block at the end
     // Header button: toggle the type of the focused block, or add an item at the end
     const listBtn = note.querySelector('.listNote')
     listBtn.addEventListener('pointerdown', (event) => event.preventDefault()) // keep focus in the textarea
@@ -388,7 +383,7 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     return note
 }
 
-// New segmented function for adding notes (will be used for shortcuts)
+// Create a note at a cascading position and focus it
 function addNote() {
     noteCount++
     const note = createNote({ x: 120 + noteCount * 30, y: 120 + noteCount * 30 })

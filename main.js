@@ -47,7 +47,7 @@ function createCanvas() {
         x, y, width, height,
         frame: false,
         transparent: true,
-        resizable: true,
+        resizable: false,
         hasShadow: false,
         alwaysOnTop: true,
         skipTaskbar: true,
@@ -58,8 +58,6 @@ function createCanvas() {
 
     canvas.setAlwaysOnTop(true, 'screen-saver')
     canvas.loadFile('canvas.html')
-    // Console debugging
-    // canvas.webContents.openDevTools({ mode: 'detach' }) 
 
     function saveBounds() {
         fs.writeFileSync(settingsPath, JSON.stringify({ bounds: canvas.getBounds() }, null, 2))

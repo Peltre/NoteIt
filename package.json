@@ -1,7 +1,9 @@
 {
   "name": "noteit",
+  "productName": "NoteIt",
   "version": "1.0.0",
-  "description": "Desktop interface app that lets you add sticky notes to any part of your screen, with a little zoom like interface that can be summoned by a key combo",
+  "description": "Floating post-its always on screen",
+  "author": "Pedro Sotelo",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
@@ -11,7 +13,6 @@
     "url": "git+https://github.com/Peltre/NoteIt.git"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
