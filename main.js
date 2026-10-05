@@ -132,11 +132,11 @@ function createCanvas() {
     tray.setToolTip('NoteIt')
 
     tray.setContextMenu(Menu.buildFromTemplate([
-        { label: 'Nueva nota', click: () => canvas.webContents.send('notes:add') },
-        { label: 'Mostrar / ocultar notas', click: () => canvas.webContents.send('notes:toggle') },
-        { label: 'Mostrar / ocultar barra', click: () => canvas.webContents.send('bar:toggle') },
+        { label: 'Nueva nota', accelerator: 'CommandOrControl+Shift+C', click: () => canvas.webContents.send('notes:add') },
+        { label: 'Mostrar / ocultar notas', accelerator: 'CommandOrControl+Shift+H', click: () => canvas.webContents.send('notes:toggle') },
+        { label: 'Mostrar / ocultar barra', accelerator: 'CommandOrControl+Alt+B', click: () => canvas.webContents.send('bar:toggle') },
         { type: 'separator' },
-        { label: 'Salir', click: () => app.quit() } 
+        { label: 'Salir', click: () => app.quit() }
     ]))
 
     tray.on('click', () => canvas.webContents.send('bar:toggle')) // left click toggles master bar
