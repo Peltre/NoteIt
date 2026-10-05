@@ -266,7 +266,9 @@ function addBlock(note, { type ='text', text = '', done = false}, after = null) 
 // Make textarea as tall as its content
 function autoGrow(textarea) {
     textarea.style.height = 'auto'
-    textarea.style.height = textarea.scrollHeight + 'px'
+    const lineH = parseFloat(getComputedStyle(textarea).lineHeight)
+    const lines = Math.max(1, Math.round(textarea.scrollHeight / lineH))
+    textarea.style.height = (lines * lineH ) + 'px'
 }
 
 // Collapse or expand a note to its header height, optionally animated
