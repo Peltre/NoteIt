@@ -5,16 +5,41 @@
   "description": "Floating post-its always on screen",
   "author": "Pedro Sotelo",
   "main": "main.js",
+  "type": "commonjs",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.peltre.noteit",
+    "productName": "NoteIt",
+    "files": [
+      "main.js",
+      "preload.js",
+      "canvas.html",
+      "canvas.js",
+      "styles.css",
+      "assets/**"
+    ],
+    "asarUnpack": [
+      "assets/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Peltre/NoteIt.git"
   },
-  "keywords": [],
+  "keywords": ["sticky-notes", "post-it", "electron", "always-on-top", "productivity"],
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Peltre/NoteIt/issues"
   },
