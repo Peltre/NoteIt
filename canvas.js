@@ -138,7 +138,8 @@ function saveNotes() {
         color: note.dataset.color,
         title: note.querySelector('.noteTitle').value,
         width: note.offsetWidth,
-        height: note.offsetHeight,
+        height: note.classList.contains('collapsed') ? parseInt(note.dataset.fullHeight) : note.offsetHeight,
+        collapsed: note.classList.contains('collapsed'),
         blocks: getBlocks(note)
     }))
     window.api.saveNotes(notes)
@@ -272,18 +273,31 @@ function autoGrow(textarea) {
     textarea.style.height = textarea.scrollHeight + 'px'
 }
 
+// Collapse or expand a note to its header height, optionally animated
+function setCollapsed(note, collapsed, animate = false) {
+    const headerH = note.querySelector('.noteHeader').offsetHeight
+    note.classList.toggle('animating', animate)
+    note.classList.toggle('collapsed', collapsed)
+    note.style.height = (collapsed ? headerH : note.dataset.fullHeight) + 'px'
+    note.scrollTop = 0
+}
+
 // Function to create a note
-function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, height = 200, blocks, text, items }) {
+function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, height = 200, blocks, text, items, collapsed = false }) {
+    height = Math.max(height, 100)
+    width = Math.max(width, 140)
     const note = document.createElement('div')
     note.className = 'note interactive'
     note.style.left = x + 'px'
     note.style.top = y + 'px'
     note.style.width = width + 'px'
     note.style.height = height + 'px'
+    note.dataset.fullHeight = height
     setNoteColor(note, color)
 
     note.innerHTML = `
         <div class="noteHeader">
+            <button class="collapseNote" title="Colapsar / expandir"><svg><use href="#icon-chevron"/></svg></button>
             <input class="noteTitle" placeholder="Título" spellcheck="false">
             <button class="listNote" title="Agregar casilla"><svg><use href="#icon-check"/></svg></button>
             <button class="colorNote" title="Cambiar color"><svg><use href="#icon-drop"/></svg></button>
@@ -292,6 +306,17 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
         <div class="noteBody"></div>
         <div class="noteGrip" title="Redimensionar"><svg><use href="#icon-grip"/></svg></div>
     `
+
+    // Collapse / expand
+    note.querySelector('.collapseNote').addEventListener('click', () => {
+        const collapsed = note.classList.contains('collapsed')
+        if (!collapsed) note.dataset.fullHeight = note.offsetHeight   // remember the open height
+        setCollapsed(note, !collapsed, true)
+        saveNotes()
+    })
+
+    // drop the transition once it finishes, so resizing stays snappy
+    note.addEventListener('transitionend', () => note.classList.remove('animating'))
 
     // Cycle to the next color and save
     note.querySelector('.colorNote').addEventListener('click', () => {
@@ -336,18 +361,21 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     makeResizable(note, note.querySelector('.noteGrip'), saveNotes)
     canvas.appendChild(note)
     clampToCanvas(note)
-    note.querySelectorAll('textarea').forEach(autoGrow)
+    if (collapsed) setCollapsed(note, true)
 
     new ResizeObserver(() => {
         note.querySelectorAll('textarea').forEach(autoGrow)
     }).observe(note)
     note.querySelector('.blockText').focus()
+
+    return note
 }
 
 // New segmented function for adding notes (will be used for shortcuts)
 function addNote() {
     noteCount++
     createNote({ x: 120 + noteCount * 30, y: 120 + noteCount * 30})
+    focusBlock(note.querySelector('.block'))
     saveNotes()
 }
 

@@ -176,13 +176,14 @@ button svg,
     pointer-events: none;
 }
 
-/* Header: title + actions */
+/* Header: collapse + title + actions */
 .noteHeader {
+    flex: 0 0 auto;
     height: 38px;
     background: var(--overlay);
     display: flex;
     align-items: center;
-    padding: 0 6px 0 14px;
+    padding: 0 6px 0 2px;
     gap: 2px;
 }
 
@@ -227,10 +228,32 @@ button svg,
     color: var(--danger);
 }
 
+/* Collapse: animated height, chevron rotates */
+.note.animating {
+    transition: height 0.25s ease;
+}
+
+.note.collapsed .noteGrip {
+    display: none;
+}
+
+.collapseNote {
+    margin-left: -2px;
+}
+
+.collapseNote svg {
+    transition: transform 0.2s;
+}
+
+.note.collapsed .collapseNote svg {
+    transform: rotate(-90deg);
+}
+
 /* Scrollable body: a column of blocks */
 .noteBody {
     flex: 1;
     min-height: 0;
+    box-sizing: border-box;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
