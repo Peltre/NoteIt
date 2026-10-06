@@ -1,7 +1,7 @@
 {
   "name": "noteit",
   "productName": "NoteIt",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Floating post-its always on screen",
   "author": "Pedro Sotelo",
   "main": "main.js",
