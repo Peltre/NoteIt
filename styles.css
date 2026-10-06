@@ -163,7 +163,6 @@ button svg,
     position: absolute;
     background: #fff59d;
     border-radius: var(--radius-note);
-    box-shadow: var(--shadow-note);
     display: flex;
     flex-direction: column;
     overflow: hidden;
