@@ -402,3 +402,8 @@ button svg,
 .masterBar:active {
     cursor: grabbing;
 }
+
+.masterBar,
+.canvasHandle {
+    z-index: 100;
+}

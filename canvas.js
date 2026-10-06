@@ -313,6 +313,11 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
         saveNotes()
     })
 
+    // Bring to front on any press (DOM order = stacking order)
+    note.addEventListener('pointerdown', () => {
+        if (note !== canvas.lastElementChild) canvas.appendChild(note)
+    }, true)
+
     // drop the transition once it finishes, so resizing stays snappy
     note.addEventListener('transitionend', () => note.classList.remove('animating'))
 
