@@ -142,6 +142,13 @@ function createCanvas() {
 
 // 4. App lifecycle
 
-app.whenReady().then(createCanvas)
+if (!app.requestSingleInstanceLock()) {
+    app.quit()
+} else {
+    app.on('second-instance', () => {
+        canvas?.webContents.send('bar:toggle')
+    })
+    app.whenReady().then(createCanvas)
+}
 app.on('will-quit', () => globalShortcut.unregisterAll())
 app.on('window-all-closed', () => app.quit())
