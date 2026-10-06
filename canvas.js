@@ -5,6 +5,7 @@ const canvas = document.getElementById('canvas')
 const addNoteBtn = document.getElementById('addNote')
 let noteCount = 0
 let dragging = false
+let topZ = 1
 
 const NOTE_COLORS = ['#fff59d', '#ffcc80', '#a5d6a7', '#90caf9', '#f8bbd0']
 
@@ -132,7 +133,9 @@ document.addEventListener('mousemove', (event) => {
 
 // Save every note to disk (through main)
 function saveNotes() {
-    const notes = [...canvas.querySelectorAll('.note')].map(note => ({
+    const notes = [...canvas.querySelectorAll('.note')]
+        .sort((a, b) => a.style.zIndex -b.style.zIndex)
+        .map(note => ({
         x: parseInt(note.style.left),
         y: parseInt(note.style.top),
         color: note.dataset.color,
@@ -291,6 +294,7 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     note.style.width = width + 'px'
     note.style.height = height + 'px'
     note.dataset.fullHeight = height
+    note.style.zIndex = ++topZ
     setNoteColor(note, color)
 
     note.innerHTML = `
@@ -313,9 +317,9 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
         saveNotes()
     })
 
-    // Bring to front on any press (DOM order = stacking order)
+    // Bring to front on any press (By z-index)
     note.addEventListener('pointerdown', () => {
-        if (note !== canvas.lastElementChild) canvas.appendChild(note)
+        note.style.zIndex = ++topZ
     }, true)
 
     // drop the transition once it finishes, so resizing stays snappy
