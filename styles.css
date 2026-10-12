@@ -239,10 +239,6 @@ button svg,
 }
 
 /* Collapse: animated height, chevron rotates */
-.note.animating {
-    transition: height 0.25s ease;
-}
-
 .note.collapsed .noteGrip {
     display: none;
 }
@@ -257,6 +253,19 @@ button svg,
 
 .note.collapsed .collapseNote svg {
     transform: rotate(-90deg);
+}
+
+/* Collapse: animated height, chevron rotates, flips up when there's no room below */
+.note.animating {
+    transition: height 0.25s ease, top 0.25s ease;
+}
+
+.note.animating .noteBody {
+    flex: 0 0 auto;
+}
+
+.note.flipUp {
+    flex-direction: column-reverse;
 }
 
 /* Scrollable body: a column of blocks */

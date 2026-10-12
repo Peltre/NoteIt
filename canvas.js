@@ -143,7 +143,8 @@ function saveNotes() {
         width: note.offsetWidth,
         height: note.classList.contains('collapsed') ? parseInt(note.dataset.fullHeight) : note.offsetHeight,
         collapsed: note.classList.contains('collapsed'),
-        blocks: getBlocks(note)
+        blocks: getBlocks(note),
+        flipUp: note.classList.contains('flipUp'),
     }))
     window.api.saveNotes(notes)
 }
@@ -286,16 +287,39 @@ function autoGrow(textarea) {
 }
 
 // Collapse or expand a note to its header height, optionally animated
+// Update: now when the note has no space below to expand, it will expand upwards instead
 function setCollapsed(note, collapsed, animate = false) {
     const headerH = note.querySelector('.noteHeader').offsetHeight
+    const fullH = parseInt(note.dataset.fullHeight)
+    const top = parseInt(note.style.top) || 0
+    const body = note.querySelector('.noteBody')
+    if (animate) body.style.height = (fullH - headerH) + 'px'
     note.classList.toggle('animating', animate)
-    note.classList.toggle('collapsed', collapsed)
-    note.style.height = (collapsed ? headerH : note.dataset.fullHeight) + 'px'
+
+    if (collapsed) {
+        // a flipped note keeps its header where it is
+        if (note.classList.contains('flipUp')) {
+            note.style.top = (top + fullH - headerH) + 'px'
+            if (!animate) note.classList.remove('flipUp') // with animation, transitionend removes it
+        }
+        note.classList.add('collapsed')
+        note.style.height = headerH + 'px'
+    } else {
+        const roomBelow = canvas.clientHeight - top
+        const fitsBelow = fullH <= roomBelow
+        const fitsAbove = top + headerH - fullH >= 0
+        if (!fitsBelow && fitsAbove) {
+            note.style.top = (top + headerH - fullH) + 'px'
+            note.classList.add('flipUp')
+        } 
+        note.classList.remove('collapsed')
+        note.style.height = fullH + 'px'
+    }
     note.scrollTop = 0
 }
 
 // Function to create a note
-function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, height = 200, blocks, text, items, collapsed = false }) {
+function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, height = 200, blocks, text, items, collapsed = false, flipUp = false } ) {
     height = Math.max(height, 100)
     width = Math.max(width, 140)
     const note = document.createElement('div')
@@ -306,6 +330,7 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     note.style.height = height + 'px'
     note.dataset.fullHeight = height
     note.style.zIndex = ++topZ
+    note.classList.toggle('flipUp', flipUp && !collapsed)
     setNoteColor(note, color)
 
     note.innerHTML = `
@@ -334,7 +359,12 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     }, true)
 
     // drop the transition once it finishes, so resizing stays snappy
-    note.addEventListener('transitionend', () => note.classList.remove('animating'))
+    note.addEventListener('transitionend', (event) => {
+        if (event.target !== note || event.propertyName !== 'height') return
+        note.classList.remove('animating')
+        note.querySelector('.noteBody').style.height = ''
+        if (note.classList.contains('collapsed')) note.classList.remove('flipUp')
+    })
 
     // Cycle to the next color and save
     note.querySelector('.colorNote').addEventListener('click', () => {
@@ -393,8 +423,8 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     makeDraggable(note, note.querySelector('.noteHeader'), saveNotes)
     makeResizable(note, note.querySelector('.noteGrip'), saveNotes)
     canvas.appendChild(note)
-    clampToCanvas(note)
     if (collapsed) setCollapsed(note, true)
+    clampToCanvas(note)
     note.querySelectorAll('textarea').forEach(autoGrow)
 
     new ResizeObserver(() => {
