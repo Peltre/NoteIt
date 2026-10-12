@@ -5,6 +5,7 @@ const path = require('path')
 const fs = require('fs')
 
 let tray = null
+let canvas = null
 
 const settingsPath = path.join(app.getPath('userData'), 'settings.json')
 const dataPath = path.join(app.getPath('userData'), 'notes.json')
@@ -29,6 +30,17 @@ function boundsVisible(bounds) {
     )
 }
 
+// Write a JSON file safely: temp file first, then rename
+function writeJson(filePath, data) {
+    try {
+        const tmp = filePath + '.tmp'
+        fs.writeFileSync(tmp, JSON.stringify(data, null, 2))
+        fs.renameSync(tmp, filePath)
+    } catch (err) {
+        console.error(`Could not write ${path.basename(filePath)}:`, err.message)
+    }
+}
+
 
 // 3. Canvas window
 
@@ -43,7 +55,7 @@ function createCanvas() {
 
     // 3.2 Window creation
 
-    const canvas = new BrowserWindow({
+    canvas = new BrowserWindow({
         x, y, width, height,
         frame: false,
         transparent: true,
@@ -60,7 +72,7 @@ function createCanvas() {
     canvas.loadFile('canvas.html')
 
     function saveBounds() {
-        fs.writeFileSync(settingsPath, JSON.stringify({ bounds: canvas.getBounds() }, null, 2))
+        writeJson(settingsPath, { bounds: canvas.getBounds() })
     }
 
     // 3.3 IPC: mouse capture / pass-through
@@ -79,7 +91,7 @@ function createCanvas() {
     // 3.4 IPC: notes persistence
 
     ipcMain.on('notes:save', (event, notes) => {
-        fs.writeFileSync(dataPath, JSON.stringify(notes, null, 2))
+        writeJson(dataPath, notes)
     })
 
     ipcMain.handle('notes:load', () => {
@@ -93,14 +105,16 @@ function createCanvas() {
     // 3.5 IPC: canvas move / resize / fit / save
 
     ipcMain.on('canvas:move', (event, { dx, dy }) => {
+        if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
         const [x, y] = canvas.getPosition()
         canvas.setPosition(Math.round(x + dx), Math.round(y + dy))
     })
 
     ipcMain.on('canvas:resize', (event, { dx, dy }) => {
+        if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
         const [w, h] = canvas.getSize()
         canvas.setSize(Math.round(Math.max(300, w + dx)), Math.round(Math.max(200, h + dy)))
-    }) 
+    })
 
     ipcMain.on('canvas:fit', () => {
         const display = screen.getDisplayMatching(canvas.getBounds())

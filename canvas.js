@@ -441,6 +441,38 @@ editCanvasBtn.addEventListener('click', () => {
 
 // 6. Canvas: edit mode (move, resize, fit)
 
+function makeWindowHandle(handle, onDrag) {
+    let lastX = 0
+    let lastY = 0
+    let activePointer = null
+
+    handle.addEventListener('pointerdown', (event) => {
+        lastX = event.screenX
+        lastY = event.screenY
+        activePointer = event.pointerId
+        dragging = true
+        handle.setPointerCapture(event.pointerId)
+    })
+
+    handle.addEventListener('pointermove', (event) => {
+        if (event.pointerId !== activePointer) return
+        const dx = event.screenX - lastX
+        const dy = event.screenY - lastY
+        lastX = event.screenX
+        lastY = event.screenY
+        if (dx || dy) onDrag(dx, dy)
+    })
+
+    const stop = () => {
+        if (activePointer === null) return
+        activePointer = null
+        dragging = false
+        window.api.saveCanvas()
+    }
+    handle.addEventListener('pointerup', stop)
+    handle.addEventListener('pointercancel', stop)
+}
+
 makeWindowHandle(document.getElementById('moveHandle'), (dx, dy) => {
     window.api.moveCanvas(dx, dy)
 })
