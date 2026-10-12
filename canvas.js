@@ -213,6 +213,9 @@ function addBlock(note, { type ='text', text = '', done = false}, after = null) 
         saveNotes()
     })
 
+    // remember the last focused block of this note
+    input.addEventListener('focus', () => { note.lastRow = row })
+
     input.addEventListener('keydown', (event) => {
         const prev = row.previousElementSibling
         const next = row.nextElementSibling
@@ -232,6 +235,14 @@ function addBlock(note, { type ='text', text = '', done = false}, after = null) 
             event.preventDefault()
             const newRow = addBlock(note, { type: row.dataset.type }, row)
             focusBlock(newRow)
+            saveNotes()
+            return
+        }
+
+        // Backspace on a empty item: drop the checkbox first, keep the line
+        if (event.key === 'Backspace' && input.value === '' && row.dataset.type === 'item') {
+            event.preventDefault()
+            setBlockType(row, 'text')
             saveNotes()
             return
         }
@@ -369,11 +380,10 @@ function createNote({ x, y, color = NOTE_COLORS[0], title = '', width = 220, hei
     const listBtn = note.querySelector('.listNote')
     listBtn.addEventListener('pointerdown', (event) => event.preventDefault()) // keep focus in the textarea
     listBtn.addEventListener('click', () => {
-        const active = document.activeElement
-        const row = active?.closest('.block')
-        if (row && note.contains(row)) {
+        const row = note.lastRow?.isConnected ? note.lastRow : null
+        if (row) {
             setBlockType(row, row.dataset.type === 'item' ? 'text' : 'item')
-            active.focus()
+            focusBlock(row)
         } else {
             focusBlock(addBlock(note, { type: 'item' }))
         }
