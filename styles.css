@@ -157,6 +157,105 @@ button svg,
     stroke-linejoin: round;
 }
 
+/* Help panel */
+#helpBtn.active {
+    background: var(--bar-hover);
+}
+
+.helpPanel {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    width: 320px;
+    padding: 14px 16px 16px;
+    box-sizing: border-box;
+    background: var(--bar-bg);
+    color: var(--bar-ink);
+    border-radius: 14px;
+    box-shadow: var(--shadow-bar);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+    cursor: default;
+
+    /* closed: invisible, a bit smaller and slightly tucked toward the bar */
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -6px) scale(0.98);
+    transform-origin: top center;
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+}
+
+.helpPanel.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0) scale(1);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s;
+}
+
+/* opening upward: anchor to the bar from below */
+.helpPanel.above {
+    top: auto;
+    bottom: calc(100% + 10px);
+    transform-origin: bottom center;
+}
+
+.helpPanel.above:not(.open) {
+    transform: translate(-50%, 6px) scale(0.98);
+}
+
+.helpPanel h3 {
+    margin: 14px 0 6px;
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.helpPanel h3:first-child {
+    margin-top: 0;
+}
+
+.helpPanel dl {
+    margin: 0;
+}
+
+.helpPanel .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 3px 0;
+}
+
+.helpPanel dt small {
+    opacity: 0.6;
+}
+
+.helpPanel dd {
+    margin: 0;
+    display: flex;
+    gap: 4px;
+    flex: 0 0 auto;
+}
+
+.helpPanel kbd {
+    font-family: inherit;
+    font-size: 11px;
+    padding: 1px 6px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+}
+
+.helpPanel p {
+    margin: 0;
+    opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .helpPanel { transition: none; }
+}
+
 /* 4. Notes */
 
 .note {

@@ -28,7 +28,7 @@ function makeDraggable(element, handle, onDrop) {
 
     // Select note to drag it around
     handle.addEventListener('pointerdown', (event) => {
-        if (event.target.closest('button, input')) return // buttons & inputs are not draggable
+        if (event.target.closest('button, input, .helpPanel')) return // buttons & inputs are not draggable
 
 
         const rect = element.getBoundingClientRect()
@@ -470,6 +470,7 @@ function toggleNotes() {
 
 function toggleBar() {
     masterBar.classList.toggle('hidden')
+    setHelp(false)
 }
 
 toggleNotesBtn.addEventListener('click', toggleNotes)
@@ -478,6 +479,28 @@ const editCanvasBtn = document.getElementById('editCanvas')
 editCanvasBtn.addEventListener('click', () => {
     canvas.classList.toggle('editing')
 })
+
+// Help panel: shortcuts at hand
+const helpBtn = document.getElementById('helpBtn')
+const helpPanel = document.getElementById('helpPanel')
+
+function setHelp(open) {
+    helpPanel.classList.toggle('open', open)
+    helpBtn.classList.toggle('active', open)
+    if (!open) return
+    // open upward if there's no room below the bar
+    helpPanel.classList.remove('above')
+    if (helpPanel.getBoundingClientRect().bottom > canvas.clientHeight) helpPanel.classList.add('above')
+}
+
+helpBtn.addEventListener('click', () => setHelp(!helpPanel.classList.contains('open')))
+
+// close it: Esc, a click on a note, or switching to another app
+document.addEventListener('keydown', (event) => { if (event.key === 'Escape') setHelp(false) })
+document.addEventListener('pointerdown', (event) => {
+    if (!event.target.closest('#helpPanel, #helpBtn')) setHelp(false)
+})
+window.addEventListener('blur', () => setHelp(false))
 
 // 6. Canvas: edit mode (move, resize, fit)
 
