@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NoteIt — sticky notes that stay on top of everything</title>
+  <meta name="description" content="Floating sticky notes for Windows that sit over any app and let clicks pass through. Free and open source.">
+  <link rel="icon" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- SVG icon sheet -->
+  <svg style="display: none" aria-hidden="true">
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-frame" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" stroke-dasharray="3 3"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13M6 10l6 6 6-6M4 21h16"/></symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.4 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1s-1.2-.4-3.9 1.5a13.4 13.4 0 0 0-7 0C6.3.6 5.1 1 5.1 1A5 5 0 0 0 5 4.8a5.4 5.4 0 0 0-1.5 3.7c0 5.5 3.3 6.6 6.4 7a3.4 3.4 0 0 0-.9 2.6V22"/></symbol>
+    <symbol id="i-cursor" viewBox="0 0 24 24"><path d="M4 4h10l6 6v10H4z"/><path d="M14 4v6h6"/><path d="M13 13l-1.5 5 2-1.5 2 1.5z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M7 11h2M11 11h2M15 11h2M8 15h8"/></symbol>
+  </svg>
+
+  <header class="nav">
+    <a class="brand" href="#">
+      <img src="img/logo.png" alt="" width="36" height="36">
+      <span>NoteIt</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#shortcuts">Shortcuts</a>
+      <a href="#changelog">Changelog</a>
+      <a class="btn btn-outline" href="https://github.com/Peltre/NoteIt">
+        <svg class="icon"><use href="#i-github"/></svg>GitHub
+      </a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Sticky notes that stay on top of everything.</h1>
+        <p class="lead">NoteIt draws your notes right on the screen, over any app: clicks pass straight through to whatever is underneath. One shortcut to add a note, one to hide them all.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="https://github.com/Peltre/NoteIt/releases/latest">
+            <svg class="icon"><use href="#i-download"/></svg>Download for Windows
+          </a>
+          <span class="muted">Free · Windows 10/11 · No account needed</span>
+        </div>
+        <p class="fine">The installer isn't code-signed yet, so Windows SmartScreen will warn you. Click "More info" and then "Run anyway".</p>
+      </div>
+
+      <!-- App mock. Replace with <img src="img/screenshot.png"> once you have a real capture. -->
+      <div class="mock" aria-hidden="true">
+        <div class="mock-titlebar"><span></span><span></span><span></span><i></i></div>
+        <div class="mock-lines"><i style="width:70%"></i><i style="width:90%"></i><i style="width:55%"></i><i style="width:80%"></i><i style="width:40%"></i><i style="width:85%"></i></div>
+        <div class="mock-bar">
+          <svg class="icon"><use href="#i-plus"/></svg>
+          <svg class="icon"><use href="#i-eye"/></svg>
+          <svg class="icon"><use href="#i-frame"/></svg>
+          <svg class="icon"><use href="#i-x"/></svg>
+        </div>
+        <div class="mock-note n1">
+          <div class="mock-head"><svg class="icon"><use href="#i-chevron"/></svg>Groceries</div>
+          <div class="mock-body">
+            <div class="row"><span class="box"></span>Oat milk</div>
+            <div class="row done"><span class="box on"></span>Coffee beans</div>
+            <div class="row"><span class="box"></span>Bread</div>
+          </div>
+        </div>
+        <div class="mock-note n2">
+          <div class="mock-head"><svg class="icon"><use href="#i-chevron"/></svg>Call Ana</div>
+          <div class="mock-body">Ask about the Friday deadline and send her the slides.</div>
+        </div>
+        <div class="mock-note n3">
+          <div class="mock-head collapsed"><svg class="icon"><use href="#i-chevron"/></svg>Ideas for v1.2</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="band">
+      <div class="wrap">
+        <h2>Built to be ignored until you need it</h2>
+        <p class="sub">Four things NoteIt gets right so it can live on your screen all day.</p>
+        <div class="features">
+          <article class="card c-yellow">
+            <svg class="icon-lg"><use href="#i-cursor"/></svg>
+            <h3>Click-through canvas</h3>
+            <p>Only the notes catch the mouse. Everything else goes straight to the app underneath, so nothing ever blocks you.</p>
+          </article>
+          <article class="card c-orange">
+            <svg class="icon-lg"><use href="#i-check"/></svg>
+            <h3>Text and checklists, mixed</h3>
+            <p>Every line is text or a checkbox. Enter adds a line, Enter on an empty box drops it. No modes, no toolbars.</p>
+          </article>
+          <article class="card c-green">
+            <svg class="icon-lg"><use href="#i-monitor"/></svg>
+            <h3>Your corner of the screen</h3>
+            <p>Move and resize the canvas, send it to another monitor, or fit it to the screen. Notes never drift off-screen.</p>
+          </article>
+          <article class="card c-blue">
+            <svg class="icon-lg"><use href="#i-keyboard"/></svg>
+            <h3>Shortcuts from anywhere</h3>
+            <p>Add a note or hide them all without leaving the app you're in. It lives in the tray and never asks for attention.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="shortcuts" class="wrap shortcuts">
+      <div class="shortcuts-copy">
+        <h2>Three shortcuts to learn</h2>
+        <p class="sub">They work globally, whichever window has focus. Right-click the tray icon any time to see them again.</p>
+      </div>
+      <dl class="keys">
+        <div><dt>New note</dt><dd><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>C</kbd></dd></div>
+        <div><dt>Show / hide notes</dt><dd><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>H</kbd></dd></div>
+        <div><dt>Show / hide control bar</dt><dd><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>B</kbd></dd></div>
+      </dl>
+    </section>
+
+    <section id="changelog" class="band">
+      <div class="wrap">
+        <div class="changelog-head">
+          <div>
+            <h2>What's new</h2>
+            <p class="sub">Every release, straight from GitHub.</p>
+          </div>
+          <a href="https://github.com/Peltre/NoteIt/releases">All releases on GitHub</a>
+        </div>
+
+        <div class="releases">
+          <article class="release">
+            <div class="release-meta">
+              <span class="version">v1.1.0 <span class="tag">Latest</span></span>
+              <span class="muted">October 2026</span>
+              <a href="https://github.com/Peltre/NoteIt/releases/latest">Download installer</a>
+            </div>
+            <ul>
+              <li>Clicking a note brings it to the front; stacking order is remembered</li>
+              <li>Only one instance of NoteIt can run at a time</li>
+              <li>Fixed text lines drifting out of alignment with the notebook rules</li>
+              <li>Removed note shadows for a cleaner look when notes overlap</li>
+            </ul>
+          </article>
+          <article class="release">
+            <div class="release-meta">
+              <span class="version">v1.0.0</span>
+              <span class="muted">October 2026</span>
+              <a href="https://github.com/Peltre/NoteIt/releases/tag/v1.0.0">Download installer</a>
+            </div>
+            <ul>
+              <li>Always-on-top notes on a click-through canvas</li>
+              <li>Floating control bar and global shortcuts</li>
+              <li>Block editor: text lines and checkboxes with keyboard navigation</li>
+              <li>Five colors, resizable and collapsible notes</li>
+              <li>Movable canvas with multi-monitor support, system tray icon</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="wrap foot">
+    <span>NoteIt is free and open source. Built with Electron.</span>
+    <nav>
+      <a href="https://github.com/Peltre/NoteIt">Source code</a>
+      <a href="https://github.com/Peltre/NoteIt/issues">Report a bug</a>
+    </nav>
+  </footer>
+
+</body>
+</html>
